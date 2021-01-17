@@ -54,3 +54,10 @@ export const setNotePosition = (patternId, noteId, position) => ({
     noteId: noteId,
     position: position,
 });
+
+export const setNoteDuration = (patternId, noteId, duration) => ({
+    type: 'SET_NOTE_DURATION',
+    patternId: patternId,
+    noteId: noteId,
+    duration: duration,
+});

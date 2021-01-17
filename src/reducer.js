@@ -150,6 +150,24 @@ const reducer = (state=initialState, action) => {
                 };
             }),
         };
+    case 'SET_NOTE_DURATION':
+        if (action.duration <= 0) return state;
+        return {
+            ...state,
+            patterns: state.patterns.map(pattern => {
+                if (pattern.id !== action.patternId) return pattern;
+                return {
+                    ...pattern,
+                    notes: pattern.notes.map(note => {
+                        if (note.id !== action.noteId) return note;
+                        return {
+                            ...note,
+                            duration: action.duration,
+                        };
+                    }),
+                };
+            }),
+        };
     case 'ADD_NOTE':
         console.log(action);
         return {
