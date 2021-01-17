@@ -76,7 +76,7 @@ const pianoStyle = {
 
 const KEYS_PER_OCTAVE = 12;
 const FIRST_OCTAVE = 4;
-const OCTAVES = 3;
+const OCTAVES = 5;
 
 /**
  * Convert line index to MIDI key.
@@ -114,7 +114,7 @@ class PianoRoll extends React.Component {
             this.synth.triggerRelease(freq(key), now);
         } else {
             node.style.backgroundColor = isSharp(which) ? 'gray' : 'silver';
-            this.synth.triggerAttack(freq(key), now);
+            this.synth.triggerAttack(freq(key), now, velocity);
         }
     }
 
