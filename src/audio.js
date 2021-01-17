@@ -74,6 +74,8 @@ export const play = async (tracks) => {
 	}
     }).toDestination();
 
+    Tone.Transport.cancel();
+
     const pattern = state.patterns[0];
     const part = new Tone.Part((time, value) => {
         synth.triggerAttackRelease(value.note, value.duration,
@@ -85,16 +87,13 @@ export const play = async (tracks) => {
                  duration: note.duration*secondsPerBeat,
                };
     })).start(0);
+
     Tone.Transport.stop();
     Tone.Transport.start();
 
     console.log(part);
 
     return;
-
-
-
-
 
 
     let context = new AudioContext();
