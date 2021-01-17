@@ -43,7 +43,7 @@ export const addNote = (patternId, note) => ({
 });
 
 export const markNoteForRemoval = (patternId, noteId) => ({
-    type: 'REMOVE_NOTE',
+    type: 'MARK_NOTE_FOR_REMOVAL',
     patternId: patternId,
     noteId: noteId,
 });
