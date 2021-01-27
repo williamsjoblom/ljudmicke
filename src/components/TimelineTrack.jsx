@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Entity from '../entity';
 import TimelineEntity from './TimelineEntity';
+import WaveformEntity from './WaveformEntity';
 import TimelineTrackControl from './TimelineTrackControl';
 import { registerAudioFile } from '../audioStore';
 import { makeBackgroundLines } from '../cssUtil';
@@ -106,13 +107,11 @@ export default class TimelineTrack extends React.Component {
         const pixelsPerBar = pixelsPerBeat * this.props.beatsPerBar;
 
         const style = {
-            height: '150px',
+            height: '110px',
             width: '100%',
-            borderBottom: "1px solid " + Colors.bgTrackDivider,
+            borderTop: "2px solid " + Colors.bgTrackDivider,
             backgroundColor: (this.props.id % 2) ? Colors.bgDarker : Colors.bgDark,
             position: 'relative',
-            // backgroundImage: backgroundImages.join(','),
-            // backgroundSize: Math.round(pixelsPerBar) + 'px 150px',
             ...makeBackgroundLines(Math.round(pixelsPerBar), Math.round(pixelsPerBeat))
         };
 
@@ -120,7 +119,7 @@ export default class TimelineTrack extends React.Component {
                     ref={this.timelineRef}>
                  {
                      this.props.track.entities.map(
-                         a => <TimelineEntity key={a.id}
+                         a => <WaveformEntity key={a.id}
                                               id={a.id}
                                               trackId={this.props.id}
                                               color={this.props.color}/>
