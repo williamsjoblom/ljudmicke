@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeMute, faWaveSquare } from '@fortawesome/free-solid-svg-icons';
 import { setVolume, setPan } from '../actions';
 
@@ -7,6 +8,34 @@ import Knob from './Knob';
 import FaButton from './FaButton';
 
 import * as Colors from '../colors';
+
+import Icon from '@mdi/react';
+import { mdiPiano,
+         mdiWaveform,
+         mdiFunctionVariant,
+         mdiVolumeMute } from '@mdi/js';
+
+const buttonStyle = {
+    display: 'inline-block',
+    margin: '0 4px 0 0',
+    padding: 0,
+    boxShadow: 'none',
+    borderRadius: '0px',
+    border: '1px solid #444444',
+    width:  '30px',
+    height: '100%',
+    backgroundColor: '#2D2D2D',
+};
+
+const getTrackIcon = (trackType) => {
+    switch (trackType) {
+    case 'audio': return mdiWaveform;
+    case 'midi': return mdiPiano;
+    default:
+        console.error('unknown track type: "' + this.props.trackType + '"');
+        return null;
+    }
+};
 
 class TimelineTrackControl extends React.Component {
     constructor(props) {
@@ -16,13 +45,23 @@ class TimelineTrackControl extends React.Component {
     render() {
         const style = {
             display: 'inline-block',
-            backgroundColor: Colors.bgLighter,
+            backgroundColor: Colors.bgDark,
             display: 'flex',
-            borderBottom: '1px solid ' + Colors.bgTrackDivider,
+            width: '130pt',
+            borderTop: '2px solid ' + Colors.bgTrackDivider,
         };
 
         const buttonDivStyle = {
             display: 'block',
+        };
+
+        const topBarEntryStyle = {
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '6px',
+            paddingLeft: '6px',
+            paddingRight: '6px',
         };
 
         return <div style={style}>
@@ -33,24 +72,71 @@ class TimelineTrackControl extends React.Component {
                               borderRight: "1px solid " + Colors.bgTrackDivider}}>
                  </div>
                  <div style={{flex: '1',
-                              marginLeft: '8px',
-                              paddingRight: '8px',
+                              /* marginLeft: '8px', */
+                              /* paddingRight: '8px', */
                               borderRight: "1px solid " + Colors.bgTrackDivider}}>
-                   <h3 style={{color: Colors.fgPrimary}}>{this.props.name}</h3>
+                   <div style={{
+                       width: '100%',
+                       //height: '32px',
+                       borderBottom: '2px solid ' + Colors.bgLight,
+                       display: 'grid',
+                       gridGap: '0',
+                       gridTemplateColumns: '1fr auto auto',
+                   }}>
+                     <div style={topBarEntryStyle}>
+                       <Icon path={getTrackIcon(this.props.trackType)}
+                             color={Colors.fgPrimary}
+                             size={1}
+                             style={{display: 'inline-block'}}/>
 
-                   <Knob width={40}
-                         height={40}
-                         value={this.props.volume}
-                         onChanged={this.props.setVolume}/>
+                       <span style={{
+                           color: Colors.fgPrimary,
+                           fontSize: '10pt',
+                           fontWeight: '500',
+                           marginLeft: '4px'}}>
+                         {this.props.name}
+                       </span>
+                     </div>
 
-                   <Knob width={40}
-                         height={40}
-                         value={this.props.pan}
-                         onChanged={this.props.setPan}/>
+                     <div style={{
+                         ...topBarEntryStyle,
+                         borderLeft: '2px solid' + Colors.bgLight,
+                     }}>
+                         <Icon path={mdiFunctionVariant}
+                               color={Colors.fgSecondary}
+                               size={.8}
+                               style={{}}/>
+                     </div>
+                     <div style={{
+                         ...topBarEntryStyle,
+                         alignText: 'center',
+                         borderLeft: '2px solid' + Colors.bgLight,
+                     }}>
+                         <Icon path={mdiVolumeMute}
+                               color={Colors.fgSecondary}
+                               size={.8}/>
+                     </div>
+                   </div>
 
-                   <div style={buttonDivStyle}>
-                     <FaButton icon={faVolumeMute} />
-                     <FaButton icon={faWaveSquare} />
+
+                   <div style={{display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'space-around',
+                                paddingTop: '8px'}}>
+                     <Knob width={40}
+                           height={40}
+                           value={this.props.volume}
+                           highlightColor={this.props.color}
+                           label={'vol'}
+                           onChanged={this.props.setVolume}/>
+
+                     <Knob width={40}
+                           height={40}
+                           origin={0.5}
+                           value={this.props.pan}
+                           label={'pan'}
+                           highlightColor={this.props.color}
+                           onChanged={this.props.setPan}/>
                    </div>
                  </div>
                </div>;
@@ -58,6 +144,7 @@ class TimelineTrackControl extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
+    trackType: state.tracks[ownProps.id].type,
     volume: state.tracks[ownProps.id].volume,
     pan: state.tracks[ownProps.id].pan,
 });
