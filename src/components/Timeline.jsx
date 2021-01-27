@@ -13,9 +13,11 @@ import { timelinePalette } from '../colors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
+import * as Colors from '../colors';
+
 const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: 'auto 1fr'
+    gridTemplateColumns: 'auto 1fr',
 };
 
 class Timeline extends React.Component {
@@ -35,15 +37,15 @@ class Timeline extends React.Component {
                                    margin: '0',
                                    border: '0',
                                    backgroundColor: '#2D2D2D',
-                                   color: 'white'}}
+                                   color: Colors.fgPrimary}}
                            onClick={this.addTrack}>
                      <FontAwesomeIcon icon={faPlus}
-                                      color="white"
+                                      color={Colors.fgPrimary}
                                       style={{marginRight:"8px"}} />
                      Add Track
                    </button>
 
-                   <TimelineAxis />
+                   <TimelineAxis/>
                    {
                        this.props.tracks.map(
                            (track, i) => ([
@@ -51,7 +53,6 @@ class Timeline extends React.Component {
                                                      id={track.id}
                                                      name={track.name}
                                                      color={timelinePalette[i]}/>,
-
                                <TimelineTrack key={track.id*2}
                                               id={track.id}
                                               number={track.id+1}
