@@ -12,18 +12,20 @@ const initialState = {
     tracks: [
         {
             name: "Track 1",
+            type: "audio",
             id: 0,
             volume: 0.5,
             pan: 0.5,
             entities: [ /*new Entity(0, "foo", 0, 300, undefined)*/ ]
         },
         {
-            name: "Track 2",
+            name: "Synth 1",
+            type: "midi",
             id: 1,
             volume: 0.5,
             pan: 0.5,
-            entities: [ /*new Entity( 0, "bar", 0, 300, undefined)*/ ]
-        }
+            entities: [ /*new Entity(0, "foo", 0, 300, undefined)*/ ]
+        },
     ],
     patterns: [
         {
@@ -86,6 +88,7 @@ const reducer = (state=initialState, action) => {
                 ...state.tracks,
                 {
                     name: "Track " + (state.tracks.length + 1),
+                    type: "midi",
                     id: state.tracks.length,
                     volume: 0.5,
                     pan: 0.5,
@@ -145,6 +148,7 @@ const reducer = (state=initialState, action) => {
                         return {
                             ...note,
                             position: action.position,
+                            key: action.key || note.key,
                         };
                     }),
                 };
