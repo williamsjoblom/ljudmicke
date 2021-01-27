@@ -1,5 +1,7 @@
 import React from 'react';
 
+import * as Colors from '../colors';
+
 const SENSITIVITY = 0.005;
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
@@ -7,31 +9,34 @@ const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 class Knob extends React.Component {
     constructor(props) {
         super(props);
-        // this.state = {
-        //     value: props.value || 0.0
-        // };
 
         this.canvasRef = React.createRef();
-
         this.onMouse = this.onMouse.bind(this);
         this.draw = this.draw.bind(this);
     }
 
     render() {
-        return <canvas ref={this.canvasRef}
-                       onMouseDown={this.onMouse}
-                       onMouseUp={this.onMouse}
-                       width={this.props.width}
-                       height={this.props.height}></canvas>;
+        return <div style={{display: 'inline-block'}}>
+                 <canvas ref={this.canvasRef}
+                         onMouseDown={this.onMouse}
+                         onMouseUp={this.onMouse}
+                         width={this.props.width}
+                         height={this.props.height}
+                         style={{display: 'block'}}></canvas>
+                 { this.props.label &&
+                   <span style={{fontWeight: '400',
+                                 fontSize: '10pt',
+                                 color: Colors.fgPrimary}}>
+                     {this.props.label}
+                   </span>
+                 }
+               </div>;
     }
 
     onMouse(event) {
         if (event.type === "mousemove") {
             const delta = -event.movementY * SENSITIVITY;
             const value = clamp(this.props.value + delta, 0, 1);
-            // this.setState({
-            //     value: clamp(this.state.value + delta, 0, 1)
-            // });
 
             if (this.props.onChanged)
                 this.props.onChanged(value);
@@ -61,20 +66,31 @@ class Knob extends React.Component {
         const endAngle = Math.PI/4;
         const angle = value*(endAngle - startAngle);
 
-        ctxt.beginPath();
-        ctxt.moveTo(centerX, centerY);
-        ctxt.arc(centerX, centerY, radius, startAngle, startAngle + angle);
-        ctxt.fillStyle = "orange";
-        ctxt.closePath();
-        ctxt.fill();
+        const origin = this.props.origin || 0;
+        const startActive = startAngle + origin*(endAngle - startAngle);
 
+        // Draw inactive ring.
         ctxt.beginPath();
         ctxt.moveTo(centerX, centerY);
-        ctxt.arc(centerX, centerY, radius, startAngle + angle, endAngle);
+        ctxt.arc(centerX, centerY, radius, startAngle, endAngle);
         ctxt.fillStyle = "gray";
         ctxt.closePath();
         ctxt.fill();
 
+        // Draw active ring.
+        ctxt.beginPath();
+
+        ctxt.moveTo(centerX, centerY);
+        {
+            const start = value < origin ? startAngle + angle : startActive;
+            const end = value < origin ? startActive : startAngle + angle;
+            ctxt.arc(centerX, centerY, radius, start, end);
+        }
+        ctxt.fillStyle = this.props.highlightColor || 'orange';
+        ctxt.closePath();
+        ctxt.fill();
+
+        // Draw actual knob.
         ctxt.beginPath();
         ctxt.arc(centerX, centerY, 0.8*radius, 0, 2*Math.PI);
 
@@ -86,6 +102,7 @@ class Knob extends React.Component {
         ctxt.fillStyle = wheelGradient;
         ctxt.fill();
 
+        // Draw dot.
         const dotOffset = 0.5*radius;
         const dotX = centerX + dotOffset*Math.cos(startAngle + angle);
         const dotY = centerY + dotOffset*Math.sin(startAngle + angle);
