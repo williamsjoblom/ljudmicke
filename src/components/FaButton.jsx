@@ -7,7 +7,7 @@ import * as Colors from '../colors';
 class FaButton extends React.Component {
     render() {
         const buttonStyle = {
-            display: 'inline-block',
+            display: 'inline',
             margin: '0 4px 0 0',
             padding: 0,
             boxShadow: 'none',
@@ -15,11 +15,14 @@ class FaButton extends React.Component {
             border: '1px solid #444444',
             width: (this.props.width || 30) + 'px',
             height: (this.props.height || 30) + 'px',
-            backgroundColor: '#2D2D2D',
+            backgroundColor: Colors.bgDark,
         };
 
         return <button style={buttonStyle} onClick={this.props.onClick}>
-                 <FontAwesomeIcon icon={this.props.icon} color={Colors.fgPrimary} />
+                 <FontAwesomeIcon
+                   style={{height: '100%', display: 'inline'}}
+                   icon={this.props.icon}
+                   color={Colors.fgSecondary} />
                </button>;
     }
 }
