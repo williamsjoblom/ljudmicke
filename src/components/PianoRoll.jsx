@@ -12,7 +12,7 @@ import * as MIDI from '../midi';
 import * as Colors from '../colors';
 
 import Note from '../note';
-import { addNote } from '../actions';
+import { addNote, setNotePosition } from '../actions';
 
 MIDI.getInputDevices().then(devices => console.log(devices));
 
@@ -76,7 +76,7 @@ const pianoStyle = {
 
 const KEYS_PER_OCTAVE = 12;
 const FIRST_OCTAVE = 4;
-const OCTAVES = 5;
+const OCTAVES = 1;
 
 /**
  * Convert line index to MIDI key.
@@ -91,6 +91,7 @@ class PianoRoll extends React.Component {
         super(props);
         this.onMIDI = this.onMIDI.bind(this);
         this.wrapperRef = React.createRef();
+        this.gridRef = React.createRef();
 
         this.keys = [];
         const nKeys = KEYS_PER_OCTAVE * OCTAVES;
@@ -98,9 +99,29 @@ class PianoRoll extends React.Component {
             this.keys.push(<div style={getKeyStyle(i)} key={i}></div>);
         }
 
-        this.onClick = this.onClick.bind(this);
+        this.keyUnderMouse = 0;
+
+        this.eventToNotePosition = this.eventToNotePosition.bind(this);
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
+        this.onDrag = this.onDrag.bind(this);
+
         this.synth = null;
         Tone.context.resume();
+    }
+
+    eventToNotePosition(event) {
+        const bound = this.gridRef.current.getBoundingClientRect();
+        const pxPosition = event.clientX - bound.left;
+        const position = pxPosition / this.props.pixelsPerSecond;
+        const snapToBeat = !event.shiftKey;
+
+        const secondsPerBeat = 60 / this.props.beatsPerMinute;
+        if (snapToBeat) {
+            return Math.floor(position/secondsPerBeat);
+        } else {
+            return position/secondsPerBeat;
+        }
     }
 
     onMIDI(key, velocity) {
@@ -131,20 +152,24 @@ class PianoRoll extends React.Component {
         MIDI.removeKeyboardListener(this.onMIDI);
     }
 
-    onClick(line, event) {
-        const bound = event.target.getBoundingClientRect();
-        const pxPosition = event.clientX - bound.left;
-        let position = pxPosition / this.props.pixelsPerSecond;
-
-        const snapToBeat = !event.shiftKey;
-        if (snapToBeat) {
-            const secondsPerBeat = 60 / this.props.beatsPerMinute;
-            position = Math.floor(position/secondsPerBeat);
-        }
-
-        const key = lineToKey(line);
+    onMouseDown(event) {
         const id = this.props.pattern.notes.length;
-        this.props.addNote(Note(id, key, position, 1));
+        // const key = lineToKey(line);
+        const position = this.eventToNotePosition(event);
+        this.props.addNote(Note(id, this.keyUnderMouse, position, 1));
+
+        document.addEventListener('mousemove', this.onDrag);
+    }
+
+    onMouseUp(event) {
+        document.removeEventListener('mousemove', this.onDrag);
+    }
+
+    onDrag(event) {
+        const position = this.eventToNotePosition(event);
+        const notes = this.props.pattern.notes;
+        const note = notes[notes.length - 1];
+        this.props.setNotePosition(note, position, this.keyUnderMouse);
     }
 
     render() {
@@ -163,18 +188,21 @@ class PianoRoll extends React.Component {
                  <div style={pianoStyle} ref={this.wrapperRef}>
                    { this.keys }
                  </div>
-                 <div style={{ flex: '1' }}>
+                 <div style={{ flex: '1' }}
+                      ref={this.gridRef}>
                    {
                        this.keys.map((key, i) => {
                            return <div style={divisionStyle(i)}
-                                       onClick={e => this.onClick(i, e)}>
+                                       onMouseDown={this.onMouseDown}
+                                       onMouseUp={this.onMouseUp}
+                                       onMouseOver={() => this.keyUnderMouse = lineToKey(i)}>
                                     {
                                         this.props.pattern.notes
                                             .filter(note => note.key === lineToKey(i) && !note.markedForRemoval)
                                             .map(note =>
                                                 <PianoRollNote
                                                   patternId={this.props.pattern.id}
-                                                  id={note.id}/>
+                                                  id={note.id} />
                                             )
                                     }
                                   </div>;
@@ -194,6 +222,7 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     addNote: note => dispatch(addNote(ownProps.patternId, note)),
+    setNotePosition: (note, position, key) => dispatch(setNotePosition(ownProps.patternId, note.id, position, key)),
 });
 
 PianoRoll = connect(

@@ -12,7 +12,7 @@ import { setNotePosition,
 const getDragAction = (event) => {
     const bound = event.target.getBoundingClientRect();
     if (Math.abs(bound.right - event.clientX) < 5) {
-        return 'resize';
+        return 'resizeRight';
     } else {
         return 'move';
     }
@@ -23,9 +23,12 @@ class PianoRollNote extends React.Component {
         super(props);
 
         this.dragAction = "";
+        this.dragInitialValue = 0;
+        this.dragClientOrigin = 0;
 
         this.ref = React.createRef();
 
+        this.dispatchDragAction = this.dispatchDragAction.bind(this);
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
         this.onDrag = this.onDrag.bind(this);
@@ -34,20 +37,28 @@ class PianoRollNote extends React.Component {
         this.onRightClick = this.onRightClick.bind(this);
     }
 
+    dispatchDragAction(value) {
+        const actionToDispatch = {
+            move: () => this.props.setPosition(value),
+            resizeRight: () => this.props.setDuration(value),
+        };
+
+        actionToDispatch[this.dragAction]();
+    }
+
     onDrag(event) {
         event.stopPropagation();
         event.preventDefault();
 
         const secondsPerBeat = 60 / this.props.beatsPerMinute;
-        const delta = event.movementX/(secondsPerBeat*this.props.pixelsPerSecond);
+        const movement = event.clientX - this.dragClientOrigin;
+        const delta = movement/(secondsPerBeat*this.props.pixelsPerSecond);
+        let value = this.dragInitialValue + delta;
 
-        if (this.dragAction === 'move') {
-            const position = this.props.note.position + delta;
-            this.props.setPosition(position);
-        } else if (this.dragAction === 'resize') {
-            const duration = this.props.note.duration + delta;
-            this.props.setDuration(duration);
-        }
+        const snapToBeat = !event.shiftKey;
+        if (snapToBeat) value = Math.round(value);
+
+        this.dispatchDragAction(value);
     }
 
     onMouseDown(event) {
@@ -55,6 +66,15 @@ class PianoRollNote extends React.Component {
         event.preventDefault();
 
         this.dragAction = getDragAction(event);
+        switch (this.dragAction) {
+        case 'move':
+            this.dragInitialValue = this.props.note.position;
+            break;
+        case 'resizeRight':
+            this.dragInitialValue = this.props.note.duration;
+            break;
+        }
+        this.dragClientOrigin = event.clientX;
 
         document.addEventListener('mousemove', this.onDrag, true);
         document.addEventListener('mouseup', this.onMouseUp, true);
@@ -74,7 +94,7 @@ class PianoRollNote extends React.Component {
         case 'move':
             this.ref.current.style.cursor = 'move';
             break;
-        case 'resize':
+        case 'resizeRight':
             this.ref.current.style.cursor = 'ew-resize';
         }
     }
@@ -97,15 +117,17 @@ class PianoRollNote extends React.Component {
 
         if (!this.props.note) debugger;
         const position = this.props.note.position * pixelsPerBeat;
-        const width = this.props.note.duration * pixelsPerBeat;
+        const width = this.props.note.duration * pixelsPerBeat - 2;
 
         const style = {
             position: 'absolute',
-            height: '20px',
+            height: '19px',
             width: width + 'px',
             left: position+ 'px',
             backgroundColor: 'green',
-            borderRadius: '4px'
+            borderRadius: '4px',
+            border: '1px solid #002200',
+            marginRight: '1px',
         };
 
         return <div style={style}
