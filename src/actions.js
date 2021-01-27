@@ -48,11 +48,12 @@ export const markNoteForRemoval = (patternId, noteId) => ({
     noteId: noteId,
 });
 
-export const setNotePosition = (patternId, noteId, position) => ({
+export const setNotePosition = (patternId, noteId, position, key) => ({
     type: 'SET_NOTE_POSITION',
     patternId: patternId,
     noteId: noteId,
     position: position,
+    key: key,
 });
 
 export const setNoteDuration = (patternId, noteId, duration) => ({
