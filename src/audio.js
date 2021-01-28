@@ -1,5 +1,10 @@
 import store from './store';
-import { setPlaybackPosition } from './actions';
+import {
+    setPlaybackPosition,
+    setPlaying,
+    setPaused,
+    setStopped,
+} from './actions';
 import { registerAudioBuffer, getAudioBuffer } from './audioStore';
 
 import * as Tone from 'tone';
@@ -125,8 +130,9 @@ const trackScheduler = (trackType) => {
     }
 };
 
+let interval = undefined;
+let timeout = undefined;
 export const play = async (tracks) => {
-
     const state = store.getState();
 
     Tone.Transport.cancel();
@@ -142,18 +148,37 @@ export const play = async (tracks) => {
     if (playing) {
         Tone.Transport.stop();
         Tone.Transport.start(Tone.now(), state.timeline.position);
+        store.dispatch(setPlaying());
 
-        const interval = setInterval(() => {
+        interval = setInterval(() => {
             store.dispatch(setPlaybackPosition(Tone.Transport.seconds));
         }, 1000/60);
 
-        setTimeout(() => {
+        timeout = setTimeout(() => {
             clearInterval(interval)
             store.dispatch(setPlaybackPosition(startTime));
+            store.dispatch(setPaused());
         }, (endTime - startTime)*1000);
     }
 };
 
 export const pause = () => {
+    Tone.Transport.pause();
+    store.dispatch(setPaused());
 
+    if (interval !== undefined)
+        clearInterval(interval);
+    if (timeout !== undefined)
+        clearTimeout(timeout);
+};
+
+export const stop = () => {
+    Tone.Transport.stop();
+    Tone.Transport.cancel();
+    store.dispatch(setStopped());
+
+    if (interval !== undefined)
+        clearInterval(interval);
+    if (timeout !== undefined)
+        clearTimeout(timeout);
 };

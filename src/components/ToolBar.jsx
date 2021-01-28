@@ -3,11 +3,11 @@ import { connect } from 'react-redux';
 
 import { setBeatsPerMinute } from '../actions';
 
-import { faPlay, faPause, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faStop, faCircle } from '@fortawesome/free-solid-svg-icons';
 import FaButton from './FaButton';
 import LabeledInput from './LabeledInput';
 
-import { play } from '../audio';
+import { play, pause, stop } from '../audio';
 
 import * as Colors from '../colors';
 
@@ -46,10 +46,18 @@ class ToolBar extends React.Component {
                    ljud<span style={{color: Colors.fgSecondary}}>micke</span>
                  </h1>
 
-                 <FaButton icon={faPlay}
+                 <FaButton icon={!this.props.playing ? faPlay : faPause}
                            width={30}
                            height={30}
-                           onClick={() => play(this.props.tracks)}/>
+                           onClick={() =>
+                               !this.props.playing
+                                   ? play(this.props.tracks)
+                                   : pause()
+                           }/>
+                 <FaButton icon={faStop}
+                           width={30}
+                           height={30}
+                           onClick={() => stop()}/>
                  <FaButton icon={faCircle}
                            width={30}
                            height={30}
@@ -96,6 +104,7 @@ const mapStateToProps = (state) => ({
     tracks: state.tracks,
     patterns: state.patterns,
     beatsPerMinute: state.timeline.beatsPerMinute,
+    playing: state.nonPersistent.playing,
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

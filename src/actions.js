@@ -62,3 +62,15 @@ export const setNoteDuration = (patternId, noteId, duration) => ({
     noteId: noteId,
     duration: duration,
 });
+
+export const setPlaying = () => ({
+    type: 'PLAY',
+});
+
+export const setPaused = () => ({
+    type: 'PAUSE',
+});
+
+export const setStopped = () => ({
+    type: 'STOP'
+});

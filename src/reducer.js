@@ -2,6 +2,9 @@ import { audioEntity, patternEntity } from './entity';
 import Note from './note';
 
 const initialState = {
+    nonPersistent: {
+        playing: false,
+    },
     timeline: {
         start: 0,
         pixelsPerSecond: 30,
@@ -208,6 +211,34 @@ const reducer = (state=initialState, action) => {
             }),
         };
 
+    case 'PLAY':
+        return {
+            ...state,
+            nonPersistent: {
+                ...state.nonPersistent,
+                playing: true,
+            },
+        }
+    case 'PAUSE':
+        return {
+            ...state,
+            nonPersistent: {
+                ...state.nonPersistent,
+                playing: false,
+            },
+        }
+    case 'STOP':
+        return {
+            ...state,
+            nonPersistent: {
+                ...state.nonPersistent,
+                playing: false,
+            },
+            timeline: {
+                ...state.timeline,
+                position: 0
+            }
+        }
     default:
         console.warn("Unhandled reduce action: '" + action.type + "'");
         return state;
