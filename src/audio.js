@@ -40,17 +40,22 @@ export const readAudioFile = (context, file) => {
 };
 
 
-const makeTrackSink = (context, destination, track) => {
-    const effectChain = [
-        new GainNode(context, { gain: track.volume*2 }),
-        new StereoPannerNode(context, { pan: track.pan*2 - 1 }),
-    ];
+const makeTrackSink = (track) => {
+    // const gain = context.createGain();
+    // gain.value = ;
 
+    // const pan = context.createStereoPanner();
+    // pan.value = ;
+
+    const effectChain = [
+        new Tone.Gain(track.volume*2),
+        new Tone.Panner(track.pan*2 - 1),
+    ];
     const output = effectChain.reduce((prevEffect, effect) => {
         prevEffect.connect(effect);
         return effect;
     });
-    output.connect(destination);
+    output.toDestination();
 
     return effectChain[0];
 };
@@ -61,82 +66,91 @@ const SourceEndPromise = (source) => new Promise(resolve => {
     };
 });
 
+const makeSynth = () => {
+    return new Tone.PolySynth(Tone.Synth, {
+	oscillator: {
+	    partials: [0, 2, 3, 4],
+	}
+    });
+};
+
+const trackEndTime = (track) => {
+    return Math.max(
+        ...track.entities.map(
+            entity => entity.position + entity.duration
+        )
+    );
+
+};
+
+const scheduleAudioTrack = (state, track) => {
+    const sink = makeTrackSink(track);
+
+    let sources = track.entities.map(entity => {
+        const buffer = getAudioBuffer(entity.bufferKey);
+        const player = new Tone.Player(buffer).connect(sink);
+        player.sync(); // Sync player with transport.
+        player.start(entity.position);
+    });
+};
+
+const scheduleMidiTrack = (state, track) => {
+    const sink = makeTrackSink(track);
+    const synth = makeSynth();
+    synth.connect(sink);
+
+    const secondsPerBeat = 60 / state.timeline.beatsPerMinute;
+    track.entities.forEach(entity => {
+        const pattern = state.patterns[entity.patternKey];
+        new Tone.Part((time, value) => {
+            synth.triggerAttackRelease(value.note, value.duration,
+                                       time, value.velocity);
+        }, pattern.notes.filter(note => !note.markedForRemoval).map(note => {
+            return { time: note.position*secondsPerBeat,
+                     note: freq(note.key),
+                     velocity: note.velocity,
+                     duration: note.duration*secondsPerBeat,
+                   };
+        })).start(entity.position);
+    });
+};
+
+const trackScheduler = (trackType) => {
+    switch (trackType) {
+    case 'audio': return scheduleAudioTrack;
+    case 'midi': return scheduleMidiTrack;
+    default:
+        console.error('unknown track type');
+        return null;
+    }
+};
+
 export const play = async (tracks) => {
 
     const state = store.getState();
 
-    const secondsPerBeat = 60 / state.timeline.beatsPerMinute;
-    console.log(secondsPerBeat);
-
-    const synth = new Tone.PolySynth(Tone.Synth, {
-	oscillator: {
-	    partials: [0, 2, 3, 4],
-	}
-    }).toDestination();
-
     Tone.Transport.cancel();
 
-    const pattern = state.patterns[0];
-    const part = new Tone.Part((time, value) => {
-        synth.triggerAttackRelease(value.note, value.duration,
-                                   time, value.velocity);
-    }, pattern.notes.filter(note => !note.markedForRemoval).map(note => {
-        return { time: note.position*secondsPerBeat,
-                 note: freq(note.key),
-                 velocity: note.velocity,
-                 duration: note.duration*secondsPerBeat,
-               };
-    })).start(0);
-
-    Tone.Transport.stop();
-    Tone.Transport.start();
-
-    console.log(part);
-
-    return;
-
-
-    let context = new AudioContext();
-
-    // NOTE: Code for playing regular timeline without tone.js
-    const position = store.getState().timeline.position;
-    let now = context.currentTime;
-
-    let interval = null;
-
-    let endPromises = [];
-    tracks.forEach(track => {
-        const sink = makeTrackSink(context, context.destination, track);
-
-        let sources = track.entities.map(entity => {
-            const buffer = getAudioBuffer(entity.bufferKey);
-            let source = context.createBufferSource();
-            source.buffer = buffer;
-            source.connect(sink);
-            return source;
-        });
-
-        sources.forEach((source, i) => {
-            const entity = track.entities[i];
-
-            const duration = 0;
-            const when = Math.max(0, (now + entity.position) - position);
-            const offset = Math.max(0, position - (now + entity.position));
-
-            if (offset > source.buffer.duration) return;
-            source.start(when, offset, /* duration */);
-            endPromises.push(SourceEndPromise(source));
-        });
+    state.tracks.forEach(track => {
+        const schedule = trackScheduler(track.type);
+        schedule(state, track);
     });
 
-    const playing = (endPromises.length > 0);
+    const startTime = 0;
+    const endTime = Math.max(...tracks.map(track => trackEndTime(track)));
+    const playing = (endTime > startTime);
     if (playing) {
+        Tone.Transport.stop();
+        Tone.Transport.start(Tone.now(), state.timeline.position);
+
         const interval = setInterval(() => {
-            store.dispatch(setPlaybackPosition(position + context.currentTime - now));
+            store.dispatch(setPlaybackPosition(Tone.Transport.seconds));
         }, 1000/60);
-        await Promise.all(endPromises);
-        clearInterval(interval);
-        store.dispatch(setPlaybackPosition(position));
+
+        setTimeout(() => {
+            clearInterval(interval)
+            store.dispatch(setPlaybackPosition(startTime));
+        }, (endTime - startTime)*1000);
     }
 };
 

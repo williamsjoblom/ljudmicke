@@ -52,11 +52,18 @@ class LabeledInput extends React.Component {
                        <Icon size={1} color={Colors.fgSecondary} path={this.props.icon}/>
                      </div>
                  }
-                 <input type="text"
-                        value={this.props.value || ""}
-                        onChange={e => this.props.onChanged(e.target.value)}
-                        style={INPUT_STYLE}>
-                 </input>
+
+                 {/* <input type="text" */}
+                 {/*        value={this.props.value || ""} */}
+                 {/*        onChange={e => this.props.onChanged(e.target.value)} */}
+                 {/*        style={INPUT_STYLE}> */}
+                 {/* </input> */}
+
+                 {
+                     this.props.children &&
+                         React.cloneElement(this.props.children, { style: INPUT_STYLE })
+                 }
+
                  {
                      this.props.label &&
                      <div style={ICON_STYLE}>{this.props.label}</div>

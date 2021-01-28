@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import * as Colors from '../colors';
+
 import { setNotePosition,
          setNoteDuration,
          markNoteForRemoval } from '../actions';
@@ -123,8 +125,8 @@ class PianoRollNote extends React.Component {
             position: 'absolute',
             height: '19px',
             width: width + 'px',
-            left: position+ 'px',
-            backgroundColor: 'green',
+            left: position + 'px',
+            backgroundColor: Colors.bgPianoNote,
             borderRadius: '4px',
             border: '1px solid #002200',
             marginRight: '1px',

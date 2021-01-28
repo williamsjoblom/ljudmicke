@@ -41,7 +41,8 @@ class Timeline extends React.Component {
                            onClick={this.addTrack}>
                      <FontAwesomeIcon icon={faPlus}
                                       color={Colors.fgPrimary}
-                                      style={{marginRight:"8px"}} />
+                                      style={{marginRight:"8px"
+                                              fontFamily: ''}} />
                      Add Track
                    </button>
 

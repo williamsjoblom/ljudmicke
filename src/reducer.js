@@ -1,4 +1,4 @@
-import Entity from './entity';
+import { audioEntity, patternEntity } from './entity';
 import Note from './note';
 
 const initialState = {
@@ -24,13 +24,18 @@ const initialState = {
             id: 1,
             volume: 0.5,
             pan: 0.5,
-            entities: [ /*new Entity(0, "foo", 0, 300, undefined)*/ ]
+            entities: [ patternEntity(0, "Pattern 1", 0, 12, 0) ]
         },
     ],
     patterns: [
         {
             name: "Pattern 1",
             id: 0,
+            notes: [ ],
+        },
+        {
+            name: "Pattern 2",
+            id: 1,
             notes: [ ],
         },
     ]

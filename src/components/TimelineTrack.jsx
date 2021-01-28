@@ -1,12 +1,23 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Entity from '../entity';
-import TimelineEntity from './TimelineEntity';
+import { audioEntity, patternEntity } from '../entity';
+
 import WaveformEntity from './WaveformEntity';
-import TimelineTrackControl from './TimelineTrackControl';
+import PatternEntity from './PatternEntity';
+
 import { registerAudioFile } from '../audioStore';
 import { makeBackgroundLines } from '../cssUtil';
 import * as Colors from '../colors';
+
+const componentFromEntityType = (type) => {
+    switch (type) {
+    case 'pattern': return PatternEntity;
+    case 'audio': return WaveformEntity;
+    default:
+        console.error(`Unknown entity type: '${type}'`);
+        return null;
+    }
+};
 
 export default class TimelineTrack extends React.Component {
     constructor(props) {
@@ -42,11 +53,11 @@ export default class TimelineTrack extends React.Component {
         const [bufferKey, buffer] = await registerAudioFile(file);
         const id = this.props.track.entities.length;
 
-        const entity = new Entity(id,
-                                  file.name,
-                                  position,
-                                  buffer.duration,
-                                  bufferKey);
+        const entity = audioEntity(id,
+                                   file.name,
+                                   position,
+                                   buffer.duration,
+                                   bufferKey);
 
         this.props.addEntity(entity);
     }
@@ -66,9 +77,7 @@ export default class TimelineTrack extends React.Component {
         this.dragEnterCounter = 0;
 
         const timelineBound = this.timelineRef.current.getBoundingClientRect();
-        const length = 150;
         const pxPosition = event.clientX - timelineBound.left;
-
 
         this.setState(state => {
             return {
@@ -118,12 +127,13 @@ export default class TimelineTrack extends React.Component {
         return <div style={style}
                     ref={this.timelineRef}>
                  {
-                     this.props.track.entities.map(
-                         a => <WaveformEntity key={a.id}
-                                              id={a.id}
-                                              trackId={this.props.id}
-                                              color={this.props.color}/>
-                     )
+                     this.props.track.entities.map(a => {
+                         const C = componentFromEntityType(a.type);
+                         return <C key={a.id}
+                                   id={a.id}
+                                   trackId={this.props.id}
+                                   color={this.props.color}/>;
+                     })
                  }
                </div>;
     }

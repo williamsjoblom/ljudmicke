@@ -184,7 +184,7 @@ class PianoRoll extends React.Component {
             ...makeBackgroundLines(Math.round(pixelsPerBar), Math.round(pixelsPerBeat))
         });
 
-        return <div style={{display: 'flex'}}>
+        return <div style={{display: 'flex', marginTop: '40px'}}>
                  <div style={pianoStyle} ref={this.wrapperRef}>
                    { this.keys }
                  </div>

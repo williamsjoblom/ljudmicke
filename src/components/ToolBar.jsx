@@ -12,7 +12,12 @@ import { play } from '../audio';
 import * as Colors from '../colors';
 
 import Icon from '@mdi/react';
-import { mdiMidi, mdiMetronome, mdiMidiPort } from '@mdi/js';
+import {
+    mdiMidi,
+    mdiMetronome,
+    mdiMidiPort,
+    mdiFormatPaint,
+} from '@mdi/js';
 
 
 const style = {
@@ -36,7 +41,7 @@ class ToolBar extends React.Component {
                  <h1 style={{ display: 'inline',
                               color: Colors.fgTernary,
                               fontSize: '27pt',
-                              fontWeight: '100',
+                              fontWeight: '400',
                               margin: '0 12px'}}>
                    ljud<span style={{color: Colors.fgSecondary}}>micke</span>
                  </h1>
@@ -54,19 +59,42 @@ class ToolBar extends React.Component {
                                icon={mdiMetronome}
                                label={'bpm'}
                                width={30}
-                               height={30}
-                               onChanged={this.props.setBeatsPerMinute}/>
+                               height={30}>
+                   <input type="text"
+                          value={this.props.beatsPerMinute}
+                          onChange={e => this.props.setBeatsPerMinute(e.target.value)}>
+                   </input>
+                 </LabeledInput>
 
-                 <LabeledInput value={"M-Audio KeyStudio"}
-                               icon={mdiMidi}
+                 <LabeledInput value={"Pattern 1"}
+                               icon={mdiFormatPaint}
                                width={150}
-                               height={30} />
+                               height={30}>
+                   <select>
+                     {
+                         this.props.patterns.map(pattern =>
+                             <option>
+                               {pattern.name}
+                             </option>
+                         )
+                     }
+                   </select>
+                 </LabeledInput>
+
+                 <LabeledInput icon={mdiMidi}
+                               width={160}
+                               height={30}>
+                   <select>
+                     <option>M-Audio KeyStudio</option>
+                   </select>
+                 </LabeledInput>
                </nav>;
     }
 }
 
 const mapStateToProps = (state) => ({
     tracks: state.tracks,
+    patterns: state.patterns,
     beatsPerMinute: state.timeline.beatsPerMinute,
 });
 
