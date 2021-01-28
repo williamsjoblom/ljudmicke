@@ -1,3 +1,5 @@
+import Color from 'color';
+
 export const timelinePalette = [
     // '#9C0D0D',
     // '#9C540D',
@@ -33,3 +35,6 @@ export const bgDarker = '#2D2D2D';
 export const bgDarkest = '#282828';
 
 export const bgTrackDivider = bgLight;
+export const bgPianoNote = '#277DA1';
+
+export const fgTimelineEntity = bg => Color(bg).lighten(0.55);
