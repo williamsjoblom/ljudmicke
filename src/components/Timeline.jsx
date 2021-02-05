@@ -15,7 +15,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import * as Colors from '../colors';
 import * as Tracks from '../tracks';
-import { trackParam } from '../paramStore';
 
 const gridStyle = {
     display: 'grid',
