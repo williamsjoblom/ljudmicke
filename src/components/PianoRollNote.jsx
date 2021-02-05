@@ -7,7 +7,6 @@ import { setNotePosition,
          setNoteDuration,
          markNoteForRemoval } from '../actions';
 
-
 /**
  * Get drag action given mouse event.
  */

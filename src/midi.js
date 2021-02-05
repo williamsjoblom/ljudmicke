@@ -28,7 +28,7 @@ navigator.requestMIDIAccess()
 
                 switch (op) {
                 case OP_KEYBOARD:
-                    keyboardListeners.forEach(fn => fn(key, value));
+                    keyboardListeners.forEach(fn => fn(key, value / 128));
                     break;
                 }
             };

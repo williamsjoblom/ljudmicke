@@ -1,20 +1,31 @@
-const baseEntity = (id, name, position, duration) => ({
+import store from './store';
+import { getAudioBuffer } from './audioStore';
+import { patternDurationInSeconds,
+         emptyPatternDurationInSeconds } from './pattern';
+
+
+const baseEntity = (id, name, position) => ({
     id: id,
     name: name,
     position: position,
-    duration: duration,
+    markedForRemoval: false,
 });
 
 export const audioEntity = (id, name, position, duration, bufferKey) => ({
     type: 'audio',
-    ...baseEntity(id, name, position, duration),
+    ...baseEntity(id, name, position),
     bufferKey: bufferKey,
+    duration: getAudioBuffer(bufferKey).duration,
 });
 
 export const patternEntity = (id, name, position, duration, patternKey) => ({
     type: 'pattern',
-    ...baseEntity(id, name, position, duration),
+    ...baseEntity(id, name, position),
     patternKey: patternKey,
+    duration: Math.max(
+        patternDurationInSeconds(patternKey),
+        emptyPatternDurationInSeconds(),
+    ),
 });
 
 // export class AudioEntity {

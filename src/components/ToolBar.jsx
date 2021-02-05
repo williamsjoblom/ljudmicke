@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { setBeatsPerMinute } from '../actions';
+import { setBeatsPerMinute, setPatternToPaint } from '../actions';
 
 import { faPlay, faPause, faStop, faCircle } from '@fortawesome/free-solid-svg-icons';
 import FaButton from './FaButton';
@@ -10,6 +10,7 @@ import LabeledInput from './LabeledInput';
 import { play, pause, stop } from '../audio';
 
 import * as Colors from '../colors';
+
 
 import Icon from '@mdi/react';
 import {
@@ -33,6 +34,11 @@ const style = {
 class ToolBar extends React.Component {
     constructor(props) {
         super(props);
+        this.onChangePatternToPaint = this.onChangePatternToPaint.bind(this);
+    }
+
+    onChangePatternToPaint(event) {
+        this.props.setPatternToPaint(+event.target.value);
     }
 
     render() {
@@ -60,8 +66,7 @@ class ToolBar extends React.Component {
                            onClick={() => stop()}/>
                  <FaButton icon={faCircle}
                            width={30}
-                           height={30}
-                           onClick={() => alert('not implemented')}/>
+                           height={30}/>
 
                  <LabeledInput value={this.props.beatsPerMinute}
                                icon={mdiMetronome}
@@ -78,10 +83,11 @@ class ToolBar extends React.Component {
                                icon={mdiFormatPaint}
                                width={150}
                                height={30}>
-                   <select>
+                   <select value={this.props.patternToPaint}
+                           onChange={this.onChangePatternToPaint}>
                      {
                          this.props.patterns.map(pattern =>
-                             <option>
+                             <option key={pattern.id} value={pattern.id}>
                                {pattern.name}
                              </option>
                          )
@@ -105,10 +111,12 @@ const mapStateToProps = (state) => ({
     patterns: state.patterns,
     beatsPerMinute: state.timeline.beatsPerMinute,
     playing: state.nonPersistent.playing,
+    patternToPaint: state.timeline.patternToPaint,
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     setBeatsPerMinute: bpm => dispatch(setBeatsPerMinute(bpm)),
+    setPatternToPaint: id => dispatch(setPatternToPaint(id)),
 });
 
 ToolBar = connect(

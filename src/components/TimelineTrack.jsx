@@ -5,6 +5,7 @@ import { audioEntity, patternEntity } from '../entity';
 import WaveformEntity from './WaveformEntity';
 import PatternEntity from './PatternEntity';
 
+import { readMIDIFile } from '../audio';
 import { registerAudioFile } from '../audioStore';
 import { makeBackgroundLines } from '../cssUtil';
 import * as Colors from '../colors';
@@ -15,6 +16,19 @@ const componentFromEntityType = (type) => {
     case 'audio': return WaveformEntity;
     default:
         console.error(`Unknown entity type: '${type}'`);
+        return null;
+    }
+};
+
+const trackCursor = (trackType) => {
+    switch(trackType) {
+    case 'automation': // Fallthrough
+    case 'audio':
+        return 'default';
+    case 'midi':
+        return 'cell';
+    default:
+        console.error(`Unknown track type: '${trackType}'`);
         return null;
     }
 };
@@ -33,6 +47,7 @@ export default class TimelineTrack extends React.Component {
         this.onDrag = this.onDrag.bind(this);
         this.onDragEnter = this.onDragEnter.bind(this);
         this.onDragLeave = this.onDragLeave.bind(this);
+        this.onClick = this.onClick.bind(this);
         this.addEntityFromFile = this.addEntityFromFile.bind(this);
     }
 
@@ -50,6 +65,13 @@ export default class TimelineTrack extends React.Component {
     }
 
     async addEntityFromFile(file, position) {
+        // if (file.type === 'audio/midi') {
+        //     const midi = await readMIDIFile(file);
+        //     console.log(midi.getMidiEvents());
+        //     return;
+        // }
+
+
         const [bufferKey, buffer] = await registerAudioFile(file);
         const id = this.props.track.entities.length;
 
@@ -110,6 +132,25 @@ export default class TimelineTrack extends React.Component {
         }
     }
 
+    onClick(event) {
+        if (this.props.track.type !== 'midi') return;
+
+        const timelineBound = this.timelineRef.current.getBoundingClientRect();
+        const pxPosition = event.clientX - timelineBound.left;
+        const position = pxPosition/this.props.pixelsPerSecond;
+
+        const duration = 10;
+
+        this.props.addEntity(
+            patternEntity(this.props.track.entities.length,
+                          this.props.patternToPaint.name,
+                          position,
+                          duration,
+                          this.props.patternToPaint.id,
+                         )
+        );
+    }
+
     render() {
         const secondsPerBeat = 60 / this.props.beatsPerMinute;
         const pixelsPerBeat = secondsPerBeat * this.props.pixelsPerSecond;
@@ -121,18 +162,22 @@ export default class TimelineTrack extends React.Component {
             borderTop: "2px solid " + Colors.bgTrackDivider,
             backgroundColor: (this.props.id % 2) ? Colors.bgDarker : Colors.bgDark,
             position: 'relative',
-            ...makeBackgroundLines(Math.round(pixelsPerBar), Math.round(pixelsPerBeat))
+            cursor: trackCursor(this.props.track.type),
+            ...makeBackgroundLines(pixelsPerBar, pixelsPerBeat),
         };
 
         return <div style={style}
-                    ref={this.timelineRef}>
+                    ref={this.timelineRef}
+                    onClick={this.onClick}>
                  {
-                     this.props.track.entities.map(a => {
+                     this.props.track.entities
+                         .filter(a => !a.markedForRemoval)
+                         .map(a => {
                          const C = componentFromEntityType(a.type);
                          return <C key={a.id}
                                    id={a.id}
                                    trackId={this.props.id}
-                                   color={this.props.color}/>;
+                                   color={this.props.color} />;
                      })
                  }
                </div>;
@@ -143,7 +188,8 @@ const mapStateToProps = (state, ownProps) => ({
     pixelsPerSecond: state.timeline.pixelsPerSecond,
     beatsPerMinute: state.timeline.beatsPerMinute,
     beatsPerBar: state.timeline.beatsPerBar,
-    track: state.tracks[ownProps.id]
+    track: state.tracks[ownProps.id],
+    patternToPaint: state.patterns[state.timeline.patternToPaint],
 });
 
 const addEntity = (trackId, entity) => ({

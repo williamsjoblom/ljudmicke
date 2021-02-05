@@ -4,9 +4,6 @@ import Fader from './Fader';
 import * as Colors from '../colors';
 
 const style = {
-    position: 'fixed',
-    bottom: '0',
-    left: '0',
     width: '100%',
     textAlign: 'left',
     backgroundColor: Colors.bgDarker,

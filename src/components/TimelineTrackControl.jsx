@@ -5,6 +5,7 @@ import { faVolumeMute, faWaveSquare } from '@fortawesome/free-solid-svg-icons';
 import { setVolume, setPan } from '../actions';
 
 import Knob from './Knob';
+import ParamKnob from './ParamKnob';
 import FaButton from './FaButton';
 
 import * as Colors from '../colors';
@@ -13,7 +14,8 @@ import Icon from '@mdi/react';
 import { mdiPiano,
          mdiWaveform,
          mdiFunctionVariant,
-         mdiVolumeMute } from '@mdi/js';
+  mdiVolumeMute,
+  mdiRobotExcitedOutline} from '@mdi/js';
 
 const buttonStyle = {
     display: 'inline-block',
@@ -31,6 +33,7 @@ const getTrackIcon = (trackType) => {
     switch (trackType) {
     case 'audio': return mdiWaveform;
     case 'midi': return mdiPiano;
+    case 'automation': return mdiRobotExcitedOutline;
     default:
         console.error('unknown track type: "' + this.props.trackType + '"');
         return null;
@@ -47,7 +50,7 @@ class TimelineTrackControl extends React.Component {
             display: 'inline-block',
             backgroundColor: Colors.bgDark,
             display: 'flex',
-            width: '130pt',
+            width: '155pt',
             borderTop: '2px solid ' + Colors.bgTrackDivider,
         };
 
@@ -123,20 +126,26 @@ class TimelineTrackControl extends React.Component {
                                 flexDirection: 'row',
                                 justifyContent: 'space-around',
                                 paddingTop: '8px'}}>
-                     <Knob width={40}
+                     <ParamKnob width={40}
                            height={40}
                            value={this.props.volume}
                            highlightColor={this.props.color}
                            label={'vol'}
-                           onChanged={this.props.setVolume}/>
+                           min={0}
+                           max={2}
+                           onChange={this.props.setVolume}
+                           param={this.props.volumeParam} />
 
-                     <Knob width={40}
+                     <ParamKnob width={40}
                            height={40}
-                           origin={0.5}
+                           origin={0}
+                           min={-1}
+                           max={1}
                            value={this.props.pan}
                            label={'pan'}
                            highlightColor={this.props.color}
-                           onChanged={this.props.setPan}/>
+                           onChange={this.props.setPan}
+                           param={this.props.panParam}/>
                    </div>
                  </div>
                </div>;

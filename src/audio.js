@@ -6,9 +6,10 @@ import {
     setStopped,
 } from './actions';
 import { registerAudioBuffer, getAudioBuffer } from './audioStore';
+import * as Tracks from './tracks';
 
 import * as Tone from 'tone';
-
+import MIDIFile from 'midifile';
 
 /**
  * Convert midi note to frequency given 440 Hz tuning.
@@ -44,17 +45,18 @@ export const readAudioFile = (context, file) => {
     });
 };
 
+export const readMIDIFile = (file) => {
+    return readFile(file).then(buffer => {
+        return new MIDIFile(buffer);
+    });
+};
 
 const makeTrackSink = (track) => {
-    // const gain = context.createGain();
-    // gain.value = ;
-
-    // const pan = context.createStereoPanner();
-    // pan.value = ;
+    const effects = Tracks.getTrackEffectChain(track.id);
 
     const effectChain = [
-        new Tone.Gain(track.volume*2),
-        new Tone.Panner(track.pan*2 - 1),
+        effects.gain,
+        effects.pan,
     ];
     const output = effectChain.reduce((prevEffect, effect) => {
         prevEffect.connect(effect);

@@ -5,6 +5,20 @@ export const editEntity = (entityId, trackId, changes) => ({
     changes: changes,
 });
 
+export const setEntityPosition = (entityId, trackId, position) => ({
+    type: 'EDIT_ENTITY',
+    entityId: entityId,
+    trackId: trackId,
+    changes: { position: Math.max(0, position) },
+});
+
+export const setEntityDuration = (entityId, trackId, duration) => ({
+    type: 'EDIT_ENTITY',
+    entityId: entityId,
+    trackId: trackId,
+    changes: { duration: Math.max(0, duration) },
+});
+
 export const setPlaybackPosition = (position) => ({
     type: 'SET_PLAYBACK_POSITION',
     position: position
@@ -22,8 +36,10 @@ export const setPan = (trackId, pan) => ({
     pan: pan,
 });
 
-export const addTrack = () => ({
+export const addTrack = (type, name) => ({
     type: 'ADD_TRACK',
+    trackType: type,
+    name: name,
 });
 
 export const setTimelineResolution = (pixelsPerSecond) => ({
@@ -34,6 +50,11 @@ export const setTimelineResolution = (pixelsPerSecond) => ({
 export const setBeatsPerMinute = bpm => ({
     type: 'SET_BPM',
     bpm: bpm,
+});
+
+export const setPatternToPaint = id => ({
+    type: 'SET_PATTERN_TO_PAINT',
+    id: id,
 });
 
 export const addNote = (patternId, note) => ({
@@ -63,6 +84,26 @@ export const setNoteDuration = (patternId, noteId, duration) => ({
     duration: duration,
 });
 
+export const setSynthParams = (synthId, params) => ({
+    type: 'SET_SYNTH_PARAMS',
+    synthId: synthId,
+    params: params,
+});
+
+export const setSynthOscillatorParams = (synthId, oscillatorId, params) => ({
+    type: 'SET_SYNTH_OSCILLATOR_PARAMS',
+    synthId: synthId,
+    oscillatorId: oscillatorId,
+    params: params,
+});
+
+export const setSynthEnvelopeParams = (synthId, envelopeId, params) => ({
+    type: 'SET_SYNTH_ENVELOPE_PARAMS',
+    synthId: synthId,
+    envelopeId: envelopeId,
+    params: params,
+});
+
 export const setPlaying = () => ({
     type: 'PLAY',
 });
@@ -72,5 +113,5 @@ export const setPaused = () => ({
 });
 
 export const setStopped = () => ({
-    type: 'STOP'
+    type: 'STOP',
 });

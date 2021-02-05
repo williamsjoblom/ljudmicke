@@ -1,56 +1,93 @@
 import React from 'react';
 
 import * as Colors from '../colors';
+import { clamp, lerp, invlerp } from '../math';
 
 const SENSITIVITY = 0.005;
 
-const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+// const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
 class Knob extends React.Component {
+    static defaultProps = {
+        min: 0,
+        max: 1,
+        origin: 0,
+    }
+
     constructor(props) {
         super(props);
 
+        this.state = {
+            label: props.label
+        };
+
         this.canvasRef = React.createRef();
+
         this.onMouse = this.onMouse.bind(this);
         this.draw = this.draw.bind(this);
     }
 
     render() {
-        return <div style={{display: 'inline-block'}}>
+        return <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            ...this.props.style
+        }}>
                  <canvas ref={this.canvasRef}
                          onMouseDown={this.onMouse}
                          onMouseUp={this.onMouse}
                          width={this.props.width}
                          height={this.props.height}
-                         style={{display: 'block'}}></canvas>
+                         style={{
+                             display: 'block',
+                             width: `${this.props.width}px`,
+                             height: `${this.props.height}px`
+                         }}></canvas>
                  { this.props.label &&
                    <span style={{fontWeight: '400',
                                  fontSize: '10pt',
                                  color: Colors.fgPrimary}}>
-                     {this.props.label}
+                     { this.state.label }
                    </span>
                  }
                </div>;
     }
 
     onMouse(event) {
+         const unit = this.props.unit
+                  ? ` ${this.props.unit}`
+                  : '';
+        const labelValue = this.props.value.toFixed(1);
+
         if (event.type === "mousemove") {
-            const delta = -event.movementY * SENSITIVITY;
-            const value = clamp(this.props.value + delta, 0, 1);
+            const [min, max] = [this.props.min, this.props.max];
 
-            if (this.props.onChanged)
-                this.props.onChanged(value);
+            const delta = -event.movementY * (SENSITIVITY * (max - min));
+            const value = clamp(this.props.value + delta, min, max);
 
+            if (this.props.onChange)
+                this.props.onChange(value);
+
+            this.setState({ label: `${labelValue} ${unit}` });
         } else if (event.type === "mousedown") {
             event.target.requestPointerLock();
+            this.dragging = true;
+            this.setState({ label: `${labelValue} ${unit}` });
             event.target.addEventListener("mousemove", this.onMouse, true);
         } else if (event.type === "mouseup") {
             document.exitPointerLock();
+            this.setState({ label: this.props.label });
             event.target.removeEventListener("mousemove", this.onMouse, true);
         }
     }
 
-    draw(value) {
+    draw(actualValue) {
+        // Normalize the value to a 0...1 interval.
+        const [min, max] = [this.props.min, this.props.max];
+        const value = invlerp(actualValue, min, max);
+        const origin = invlerp(this.props.origin, min, max);
+
         let ctxt = this.ctxt;
         ctxt.clearRect(0, 0, ctxt.canvas.width, ctxt.canvas.height);
 
@@ -66,7 +103,7 @@ class Knob extends React.Component {
         const endAngle = Math.PI/4;
         const angle = value*(endAngle - startAngle);
 
-        const origin = this.props.origin || 0;
+
         const startActive = startAngle + origin*(endAngle - startAngle);
 
         // Draw inactive ring.

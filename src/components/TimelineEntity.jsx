@@ -1,54 +1,112 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Entity from '../entity';
 import Color from 'color';
 
-import { editEntity } from '../actions';
-import { getAudioBuffer } from '../audioStore';
+import { editEntity,
+         setEntityPosition,
+         setEntityDuration } from '../actions';
 
-const PIXELS_PER_SECOND = 30;
+/**
+ * Get drag action given mouse event.
+ */
+const getDragAction = (event) => {
+    const bound = event.target.getBoundingClientRect();
+    if (Math.abs(bound.right - event.clientX) < 5) {
+        return 'resizeRight';
+    } else {
+        return 'move';
+    }
+};
 
 export default class TimelineEntity extends React.Component {
 
     constructor(props) {
         super(props);
         this.canvasRef = React.createRef();
-        this.gridRef = React.createRef();
 
+        this.dragAction = "";
         this.dragInitialValue = 0;
         this.dragClientOrigin = 0;
 
-        this.onMouseMove = this.onMouseMove.bind(this);
+        this.onDrag = this.onDrag.bind(this);
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
+        this.onClick = this.onClick.bind(this);
+        this.onRightClick = this.onRightClick.bind(this);
+        this.dispatchDragAction = this.dispatchDragAction.bind(this);
+    }
+
+    onClick(event) {
+        event.stopPropagation();
+    }
+
+    onRightClick(event) {
+        event.stopPropagation();
+        event.preventDefault();
+
+        this.props.markForRemoval();
     }
 
     onMouseDown(event) {
-        document.addEventListener('mousemove', this.onMouseMove);
-        document.addEventListener('mouseup', this.onMouseUp);
+        event.stopPropagation();
+        event.preventDefault();
 
-        this.dragInitialValue = this.props.entity.position;
+        this.dragAction = getDragAction(event);
+        switch (this.dragAction) {
+        case 'move':
+            this.dragInitialValue = this.props.entity.position;
+            break;
+        case 'resizeRight':
+            this.dragInitialValue = this.props.entity.duration;
+            break;
+        }
         this.dragClientOrigin = event.clientX;
+
+        document.addEventListener('mousemove', this.onDrag);
+        document.addEventListener('mouseup', this.onMouseUp);
     }
 
     onMouseUp(event) {
-        document.removeEventListener('mousemove', this.onMouseMove);
+        event.stopPropagation();
+
+        document.removeEventListener('mousemove', this.onDrag);
         document.removeEventListener('mouseup', this.onMouseUp);
     }
 
-    onMouseMove(event) {
+    dispatchDragAction(value) {
+        const actionToDispatch = {
+            move: () => this.props.setPosition(value),
+            resizeRight: () => this.props.setDuration(value),
+        };
+
+        actionToDispatch[this.dragAction]();
+    }
+
+    onDrag(event) {
         event.stopPropagation();
         event.preventDefault();
 
         const secondsPerBeat = 60 / this.props.beatsPerMinute;
         const movement = event.clientX - this.dragClientOrigin;
         const delta = movement/(this.props.pixelsPerSecond);
-        let position = this.dragInitialValue + delta;
+        let value = this.dragInitialValue + delta;
 
         const snapToBeat = !event.shiftKey;
-        if (snapToBeat) position = Math.round(position/secondsPerBeat)*secondsPerBeat;
+        if (snapToBeat) value = Math.round(value/secondsPerBeat)*secondsPerBeat;
 
-        this.props.setPosition(Math.max(position, 0));
+        this.dispatchDragAction(value);
+    }
+
+    onMouseMove(event) {
+        const dragAction = getDragAction(event);
+        switch (dragAction) {
+        case 'move':
+            event.target.style.cursor = 'move';
+            break;
+        case 'resizeRight':
+            event.target.style.cursor = 'ew-resize';
+            break;
+        }
     }
 
     render() {
@@ -71,8 +129,9 @@ export default class TimelineEntity extends React.Component {
         };
         return <div style={style}
                     onMouseDown={this.onMouseDown}
-                    ref={this.gridRef}>
-
+                    onMouseMove={this.onMouseMove}
+                    onClick={this.onClick}
+                    onContextMenu={this.onRightClick}>
                  <p style={{position:'absolute',
                             margin: '0 2px',
                             color: Color(this.props.color).darken(0.75),
@@ -99,7 +158,13 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     setPosition: (position) => dispatch(
-        editEntity(ownProps.id, ownProps.trackId, { position: position })
+        setEntityPosition(ownProps.id, ownProps.trackId, position)
+    ),
+    setDuration: (duration) => dispatch(
+        setEntityDuration(ownProps.id, ownProps.trackId, duration)
+    ),
+    markForRemoval: () => dispatch(
+        editEntity(ownProps.id, ownProps.trackId, { markedForRemoval: true })
     ),
     editEntity: (changes) => dispatch(editEntity(ownProps.id, ownProps.trackId, changes)),
 });

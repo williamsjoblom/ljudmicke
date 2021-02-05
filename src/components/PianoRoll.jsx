@@ -66,6 +66,11 @@ const getKeyStyle = (key) => {
         ...(sharp ? sharpKeyStyle : keyStyle),
         height: height + 'px',
         marginTop: marginTop + 'px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignContent: 'center',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
     };
 };
 
@@ -75,8 +80,8 @@ const pianoStyle = {
 };
 
 const KEYS_PER_OCTAVE = 12;
-const FIRST_OCTAVE = 4;
-const OCTAVES = 1;
+const FIRST_OCTAVE = 1;
+const OCTAVES = 5;
 
 /**
  * Convert line index to MIDI key.
@@ -84,6 +89,16 @@ const OCTAVES = 1;
 const lineToKey = (line) => {
     const LAST_OCTAVE = (FIRST_OCTAVE + OCTAVES)*KEYS_PER_OCTAVE;
     return LAST_OCTAVE - line;
+};
+
+const keyToString = (key) => {
+    const octave = Math.floor(key/12);
+    const note = (key - 1) % 12;
+    const noteToString = ['C', 'C#', 'D', 'D#', 'E',
+                          'F', 'F#', 'G', 'G#', 'A',
+                          'A#', 'B'];
+
+    return `${noteToString[note]}${octave}`;
 };
 
 class PianoRoll extends React.Component {
@@ -96,7 +111,18 @@ class PianoRoll extends React.Component {
         this.keys = [];
         const nKeys = KEYS_PER_OCTAVE * OCTAVES;
         for (let i = 0; i < nKeys; i++) {
-            this.keys.push(<div style={getKeyStyle(i)} key={i}></div>);
+            this.keys.push(<div style={getKeyStyle(i)} key={i}>
+                             {
+                                 lineToKey(i) % 12 === 1
+                                 ? <span style={{
+                                     marginRight: '4px',
+                                     fontStyle: 'italic',
+                                     color: '#A0A0A0',
+                                     fontWeight: 400
+                                 }}>{keyToString(lineToKey(i))}</span>
+                                 : null
+                             }
+                           </div>);
         }
 
         this.keyUnderMouse = 0;
@@ -145,11 +171,11 @@ class PianoRoll extends React.Component {
 		partials: [0, 2, 3, 4],
 	    }
 	}).toDestination();
-        MIDI.addKeyboardListener(this.onMIDI);
+        // MIDI.addKeyboardListener(this.onMIDI);
     }
 
     componentWillUnmount() {
-        MIDI.removeKeyboardListener(this.onMIDI);
+        // MIDI.removeKeyboardListener(this.onMIDI);
     }
 
     onMouseDown(event) {
@@ -181,10 +207,10 @@ class PianoRoll extends React.Component {
             position: 'relative',
             height: LINE_HEIGHT + 'px',
             backgroundColor: i % 2 ? Colors.bgDarker : Colors.bgDark,
-            ...makeBackgroundLines(Math.round(pixelsPerBar), Math.round(pixelsPerBeat))
+            ...makeBackgroundLines(pixelsPerBar, pixelsPerBeat)
         });
 
-        return <div style={{display: 'flex', marginTop: '40px'}}>
+        return <div style={{display: 'flex'}}>
                  <div style={pianoStyle} ref={this.wrapperRef}>
                    { this.keys }
                  </div>
@@ -195,12 +221,14 @@ class PianoRoll extends React.Component {
                            return <div style={divisionStyle(i)}
                                        onMouseDown={this.onMouseDown}
                                        onMouseUp={this.onMouseUp}
+                                       key={i}
                                        onMouseOver={() => this.keyUnderMouse = lineToKey(i)}>
                                     {
                                         this.props.pattern.notes
                                             .filter(note => note.key === lineToKey(i) && !note.markedForRemoval)
                                             .map(note =>
                                                 <PianoRollNote
+                                                  key={note.id}
                                                   patternId={this.props.pattern.id}
                                                   id={note.id} />
                                             )
