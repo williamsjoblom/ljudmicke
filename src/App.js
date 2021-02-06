@@ -17,6 +17,7 @@ import {
 
 import * as Tone from 'tone';
 import * as MIDI from './midi';
+import * as Keyboard from './keyboard';
 
 const mySynth = new BasicSynth();
 
@@ -28,7 +29,9 @@ MIDI.addKeyboardListener((key, velocity) => {
     } else {
         mySynth.triggerRelease(f, Tone.now());
     }
-});
+})
+
+Keyboard.init(mySynth)
 
 let App = (props) => {
     return (
