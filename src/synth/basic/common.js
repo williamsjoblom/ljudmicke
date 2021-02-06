@@ -25,4 +25,18 @@ export const KNOB_WRAPPER_TEXT_STYLE = {
     width: '60px',
 };
 
+export const SELECT_STYLE = {
+    textAlign: 'right',
+    padding: '3px 0px',
+    margin: 'auto',
+    border: 0,
+    width: '60px',
+    fontWeight: '500',
+    fontFamily: 'Maven Pro',
+    fontSize: '9pt',
+    backgroundColor: Colors.bgLighter,
+    color: Colors.fgSecondary,
+    marginBottom: '8px',
+};
+
 export const KNOB_SIZE = 40;

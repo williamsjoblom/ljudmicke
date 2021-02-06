@@ -9,22 +9,9 @@ import ParamKnob from '../../components/ParamKnob';
 import {
     KNOB_WRAPPER_STYLE,
     KNOB_WRAPPER_TEXT_STYLE,
+    SELECT_STYLE,
     KNOB_SIZE,
 } from './common';
-
-const OSC_SELECT_STYLE = {
-    textAlign: 'right',
-    padding: '3px 0px',
-    margin: 'auto',
-    border: 0,
-    width: '60px',
-    fontWeight: '500',
-    fontFamily: 'Maven Pro',
-    fontSize: '9pt',
-    backgroundColor: Colors.bgLighter,
-    color: Colors.fgSecondary,
-    marginBottom: '8px',
-};
 
 class OscillatorControl extends React.Component {
 
@@ -40,7 +27,7 @@ class OscillatorControl extends React.Component {
                {this.props.name}
              </span>
              <select value={this.props.params.waveform}
-                     style={OSC_SELECT_STYLE}
+                     style={SELECT_STYLE}
                      onChange={e => {
                          const w = e.target.value;
                          this.props.setWaveform(w);
