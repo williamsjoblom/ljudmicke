@@ -14,6 +14,8 @@ class Knob extends React.Component {
 
     constructor(props) {
         super(props);
+        console.assert(!(props.min <= 0 && props.log),
+                       'Logarithmic knobs must have a range excluding zero');
 
         this.state = {
             label: props.label
@@ -23,6 +25,54 @@ class Knob extends React.Component {
 
         this.onMouse = this.onMouse.bind(this);
         this.draw = this.draw.bind(this);
+        this.getRotation = this.getRotation.bind(this);
+        this.getRotationLog = this.getRotationLog.bind(this);
+        this.getRotationLin = this.getRotationLin.bind(this);
+        this.getValue = this.getValue.bind(this);
+        this.getValueLin = this.getValueLin.bind(this);
+        this.getValueLog = this.getValueLog.bind(this);
+    }
+
+    getRotation(value) {
+        if (this.props.log) {
+            const rot = this.getRotationLog(value);
+            console.log(`${value} => ${rot}`);
+            return rot;
+        } else
+            return this.getRotationLin(value);
+    }
+
+    getRotationLog(value) {
+        if (value === 0) return 0;
+
+        const minV = Math.log(this.props.min);
+        const maxV = Math.log(this.props.max);
+        const scale = maxV - minV;
+
+        return (Math.log(value) - minV) / scale;
+    }
+
+    getRotationLin(value) {
+        return invlerp(value, this.props.min, this.props.max);
+    }
+
+    getValue(rotation) {
+        if (this.props.log)
+            return this.getValueLog(rotation);
+        else
+            return this.getValueLin(rotation);
+    }
+
+    getValueLog(rotation) {
+        const minV = Math.log(this.props.min);
+        const maxV = Math.log(this.props.max);
+        const scale = maxV - minV;
+
+        return Math.exp(rotation * scale + minV);
+    }
+
+    getValueLin(rotation) {
+        return lerp(rotation, this.props.min, this.props.max);
     }
 
     render() {
@@ -57,18 +107,24 @@ class Knob extends React.Component {
               ? 2
               : this.props.decimals;
         const labelValue = this.props.value.toFixed(decimalCount);
-
         const unit = this.props.unit
               ? ` ${this.props.unit}`
               : '';
+
         if (event.type === "mousemove") {
             const [min, max] = [this.props.min, this.props.max];
 
-            const delta = -event.movementY * (SENSITIVITY * (max - min));
-            const value = clamp(this.props.value + delta, min, max);
+            const rotationDelta = -event.movementY * SENSITIVITY; // * (max - min));
+            const rotation = this.getRotation(this.props.value);
+            const newRotation = rotation + rotationDelta;
+            const newValue = clamp(this.getValue(newRotation), min, max);
+
+            // const value = clamp(this.props.value + delta, min, max);
+
+
 
             if (this.props.onChange)
-                this.props.onChange(value);
+                this.props.onChange(newValue);
 
             this.setState({ label: `${labelValue} ${unit}` });
         } else if (event.type === "mousedown") {
@@ -86,8 +142,8 @@ class Knob extends React.Component {
     draw(actualValue) {
         // Normalize the value to a 0...1 interval.
         const [min, max] = [this.props.min, this.props.max];
-        const value = invlerp(actualValue, min, max);
-        const origin = invlerp(this.props.origin, min, max);
+        const value = this.getRotation(actualValue); //invlerp(actualValue, min, max);
+        const origin = this.getRotation(this.props.origin); // invlerp(this.props.origin, min, max);
 
         let ctxt = this.ctxt;
         ctxt.clearRect(0, 0, ctxt.canvas.width, ctxt.canvas.height);

@@ -42,7 +42,8 @@ class EnvelopeControl extends React.Component {
                             value={this.props.params.attack}
                             highlightColor={this.props.color}
                             label={'attack'}
-                            min={0}
+                            log
+                            min={0.01}
                             max={10}
                             unit={'s'}
                             style={{marginBottom: '8px'}}
@@ -53,7 +54,8 @@ class EnvelopeControl extends React.Component {
                             value={this.props.params.decay}
                             highlightColor={this.props.color}
                             label={'decay'}
-                            min={0}
+                            log
+                            min={0.01}
                             max={10}
                             unit={'s'}
                             style={{marginBottom: '8px'}}
@@ -74,7 +76,8 @@ class EnvelopeControl extends React.Component {
                             value={this.props.params.release}
                             highlightColor={this.props.color}
                             label={'release'}
-                            min={0}
+                            log
+                            min={0.01}
                             max={10}
                             unit={'s'}
                             style={{marginBottom: '8px'}}

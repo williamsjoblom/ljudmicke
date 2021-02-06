@@ -21,6 +21,7 @@ class FilterControl extends React.Component  {
                             decimals={0}
                             value={this.props.params.cutoff}
                             label={'cutoff'}
+                            log
                             min={10}
                             max={10000}
                             unit={'Hz'}
