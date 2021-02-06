@@ -2,6 +2,8 @@
 
 A work-in-progress digital audio workstation built on WebAudio and React.
 
+[Demo](https://distracted-stonebraker-6cef19.netlify.app/)
+
 ## Usage
 In the project directory, you can run:
 ### `npm start`
