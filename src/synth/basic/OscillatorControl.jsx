@@ -55,39 +55,42 @@ class OscillatorControl extends React.Component {
                <option value={'sawtooth'}>SAW</option>
              </select>
 
-             <Knob width={KNOB_SIZE} height={KNOB_SIZE}
-                   value={this.props.params.semiTones}
-                   highlightColor={'#F94144'}
-                   label={'semi'}
-                   max={24}
-                   min={-24}
-                   style={{marginBottom: '8px'}}
-                   onChange={n => {
-                       this.props.setSemiTones(n);
-                       this.props.oscillator.semitones = Math.round(n);
-                   }} />
+                 <Knob width={KNOB_SIZE} height={KNOB_SIZE}
+                       decimals={0}
+                       value={this.props.params.semiTones}
+                       highlightColor={'#F94144'}
+                       label={'semi'}
+                       max={24}
+                       min={-24}
+                       style={{marginBottom: '8px'}}
+                       onChange={n => {
+                           this.props.setSemiTones(n);
+                           this.props.oscillator.semitones = Math.round(n);
+                       }} />
 
-             <ParamKnob width={KNOB_SIZE} height={KNOB_SIZE}
-                        value={this.props.params.detune}
-                        highlightColor={'#F94144'}
-                        label={'detune'}
-                        unit={'ct'}
-                        min={-100}
-                        max={100}
-                        style={{marginBottom: '8px'}}
-                        onChange={this.props.setDetune}
-                        param={this.props.oscillator.detune} />
+                 <ParamKnob width={KNOB_SIZE} height={KNOB_SIZE}
+                            decimals={0}
+                            value={this.props.params.detune}
+                            highlightColor={'#F94144'}
+                            label={'detune'}
+                            unit={'ct'}
+                            min={-100}
+                            max={100}
+                            style={{marginBottom: '8px'}}
+                            onChange={this.props.setDetune}
+                            param={this.props.oscillator.detune} />
 
-             <ParamKnob width={KNOB_SIZE} height={KNOB_SIZE}
-                        value={this.props.params.gain}
-                        highlightColor={'#F94144'}
-                        label={'gain'}
-                        min={0}
-                        max={1}
-                        origin={0}
-                        style={{marginBottom: '8px'}}
-                        onChange={this.props.setGain}
-                        param={this.props.gain.gain} />
+                 <ParamKnob width={KNOB_SIZE} height={KNOB_SIZE}
+                            decimals={2}
+                            value={this.props.params.gain}
+                            highlightColor={'#F94144'}
+                            label={'gain'}
+                            min={0}
+                            max={1}
+                            origin={0}
+                            style={{marginBottom: '8px'}}
+                            onChange={this.props.setGain}
+                            param={this.props.gain.gain} />
            </div>;
     }
 }

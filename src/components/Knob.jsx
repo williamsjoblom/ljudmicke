@@ -5,8 +5,6 @@ import { clamp, lerp, invlerp } from '../math';
 
 const SENSITIVITY = 0.005;
 
-// const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-
 class Knob extends React.Component {
     static defaultProps = {
         min: 0,
@@ -55,11 +53,14 @@ class Knob extends React.Component {
     }
 
     onMouse(event) {
-         const unit = this.props.unit
-                  ? ` ${this.props.unit}`
-                  : '';
-        const labelValue = this.props.value.toFixed(1);
+        const decimalCount = this.props.decimals === undefined
+              ? 2
+              : this.props.decimals;
+        const labelValue = this.props.value.toFixed(decimalCount);
 
+        const unit = this.props.unit
+              ? ` ${this.props.unit}`
+              : '';
         if (event.type === "mousemove") {
             const [min, max] = [this.props.min, this.props.max];
 

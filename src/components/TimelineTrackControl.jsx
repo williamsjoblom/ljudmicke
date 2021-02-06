@@ -75,12 +75,9 @@ class TimelineTrackControl extends React.Component {
                               borderRight: "1px solid " + Colors.bgTrackDivider}}>
                  </div>
                  <div style={{flex: '1',
-                              /* marginLeft: '8px', */
-                              /* paddingRight: '8px', */
                               borderRight: "1px solid " + Colors.bgTrackDivider}}>
                    <div style={{
                        width: '100%',
-                       //height: '32px',
                        borderBottom: '2px solid ' + Colors.bgLight,
                        display: 'grid',
                        gridGap: '0',
@@ -127,25 +124,27 @@ class TimelineTrackControl extends React.Component {
                                 justifyContent: 'space-around',
                                 paddingTop: '8px'}}>
                      <ParamKnob width={40}
-                           height={40}
-                           value={this.props.volume}
-                           highlightColor={this.props.color}
-                           label={'vol'}
-                           min={0}
-                           max={2}
-                           onChange={this.props.setVolume}
-                           param={this.props.volumeParam} />
+                                height={40}
+                                decimal={2}
+                                value={this.props.volume}
+                                highlightColor={this.props.color}
+                                label={'vol'}
+                                min={0}
+                                max={2}
+                                onChange={this.props.setVolume}
+                                param={this.props.volumeParam} />
 
                      <ParamKnob width={40}
-                           height={40}
-                           origin={0}
-                           min={-1}
-                           max={1}
-                           value={this.props.pan}
-                           label={'pan'}
-                           highlightColor={this.props.color}
-                           onChange={this.props.setPan}
-                           param={this.props.panParam}/>
+                                height={40}
+                                decimal={2}
+                                origin={0}
+                                min={-1}
+                                max={1}
+                                value={this.props.pan}
+                                label={'pan'}
+                                highlightColor={this.props.color}
+                                onChange={this.props.setPan}
+                                param={this.props.panParam}/>
                    </div>
                  </div>
                </div>;

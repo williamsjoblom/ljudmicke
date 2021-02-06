@@ -38,6 +38,7 @@ class EnvelopeControl extends React.Component {
                    {this.props.name}
                  </span>
                  <ParamKnob width={KNOB_SIZE} height={KNOB_SIZE}
+                            decimals={2}
                             value={this.props.params.attack}
                             highlightColor={this.props.color}
                             label={'attack'}
@@ -48,6 +49,7 @@ class EnvelopeControl extends React.Component {
                             onChange={this.props.setAttack}
                             param={new ParamWrapper(this.props.envelope, 'attack')} />
                  <ParamKnob width={KNOB_SIZE} height={KNOB_SIZE}
+                            decimals={2}
                             value={this.props.params.decay}
                             highlightColor={this.props.color}
                             label={'decay'}
@@ -58,6 +60,7 @@ class EnvelopeControl extends React.Component {
                             onChange={this.props.setDecay}
                             param={new ParamWrapper(this.props.envelope, 'decay')} />
                  <ParamKnob width={KNOB_SIZE} height={KNOB_SIZE}
+                            decimals={2}
                             value={this.props.params.sustain}
                             highlightColor={this.props.color}
                             label={'sustain'}
@@ -67,6 +70,7 @@ class EnvelopeControl extends React.Component {
                             onChange={this.props.setSustain}
                             param={new ParamWrapper(this.props.envelope, 'sustain')}/>
                  <ParamKnob width={KNOB_SIZE} height={KNOB_SIZE}
+                            decimals={2}
                             value={this.props.params.release}
                             highlightColor={this.props.color}
                             label={'release'}

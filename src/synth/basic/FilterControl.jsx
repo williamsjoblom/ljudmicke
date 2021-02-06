@@ -18,6 +18,7 @@ class FilterControl extends React.Component  {
                    {this.props.name}
                  </span>
                  <ParamKnob width={KNOB_SIZE} height={KNOB_SIZE}
+                            decimals={0}
                             value={this.props.params.cutoff}
                             label={'cutoff'}
                             min={10}
@@ -29,6 +30,7 @@ class FilterControl extends React.Component  {
                             onChange={this.props.setCutoff}/>
 
                  <ParamKnob width={KNOB_SIZE} height={KNOB_SIZE}
+                            decimals={1}
                             value={this.props.params.resonance}
                             label={'resonance'}
                             min={0}
@@ -39,6 +41,7 @@ class FilterControl extends React.Component  {
                             onChange={this.props.setResonance}/>
 
                  <Knob width={KNOB_SIZE} height={KNOB_SIZE}
+                       decimals={2}
                        value={this.props.params.envelopeIntensity}
                        highlightColor={this.props.color}
                        label={'eg int'}
