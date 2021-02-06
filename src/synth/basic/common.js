@@ -8,6 +8,7 @@ export const KNOB_WRAPPER_STYLE = {
     border: `1px solid ${Colors.bgLighter}`,
     margin: '4px',
     width: '80px',
+    backgroundColor: Colors.bgDark,
 };
 
 export const KNOB_WRAPPER_TEXT_STYLE = {
