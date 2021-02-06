@@ -22,7 +22,7 @@ const makeEnvelopeOptions = (params) => ({
 });
 
 const makeFilterOptions = (params) => ({
-    type: 'lowpass',
+    type: params.type,
     Q: params.resonance,
 });
 
