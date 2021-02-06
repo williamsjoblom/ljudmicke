@@ -1,3 +1,4 @@
+import React from 'react';
 import { connect } from 'react-redux';
 import './App.css';
 
@@ -19,45 +20,60 @@ import * as Tone from 'tone';
 import * as MIDI from './midi';
 import * as Keyboard from './keyboard';
 
-const mySynth = new BasicSynth();
 
-MIDI.addKeyboardListener((key, velocity) => {
-    const f = Tone.Midi(key).toFrequency();
+class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.mySynth = new BasicSynth();
 
-    if (velocity > 0) {
-        mySynth.triggerAttack(f, Tone.now(), velocity);
-    } else {
-        mySynth.triggerRelease(f, Tone.now());
+        this.onMIDI = this.onMIDI.bind(this);
     }
-})
 
-Keyboard.init(mySynth)
+    onMIDI(key, velocity) {
+        const f = Tone.Midi(key).toFrequency();
+        if (velocity > 0) {
+            this.mySynth.triggerAttack(f, Tone.now(), velocity);
+        } else {
+            this.mySynth.triggerRelease(f, Tone.now());
+        }
+    }
 
-let App = (props) => {
-    return (
-        <div className="App">
-            <ToolBar />
-          <Timeline />
-          <BottomDrawer>
-            <BottomDrawerTab name={"Mixer"}
-                             icon={mdiTuneVertical}>
-              <Mixer />
-            </BottomDrawerTab>
-            <BottomDrawerTab name={"Piano Roll"}
-                             icon={mdiPiano}
-                             resizable>
-              <PianoRoll patternId={0}/>
-            </BottomDrawerTab>
+    componentDidMount() {
+        MIDI.addKeyboardListener(this.onMIDI);
+        Keyboard.addMIDIListener(this.onMIDI);
+    }
 
-            <BottomDrawerTab name={"Synth"}
-                             icon={mdiPiano}
-                             resizable>
-            <BasicSynthComponent synth={mySynth} />
-            </BottomDrawerTab>
-          </BottomDrawer>
-        </div>
-    );
-};
+    componentWillUnmount() {
+        MIDI.removeKeyboardListener(this.onMIDI);
+        Keyboard.removeMIDIListener(this.onMIDI);
+    }
+
+    render() {
+        return (
+            <div className="App">
+              <ToolBar />
+              <Timeline />
+              <BottomDrawer>
+                <BottomDrawerTab name={"Mixer"}
+                                 icon={mdiTuneVertical}>
+                  <Mixer />
+                </BottomDrawerTab>
+                <BottomDrawerTab name={"Piano Roll"}
+                                 icon={mdiPiano}
+                                 resizable>
+                  <PianoRoll patternId={0}/>
+                </BottomDrawerTab>
+
+                <BottomDrawerTab name={"Synth"}
+                                 icon={mdiPiano}
+                                 resizable>
+                  <BasicSynthComponent synth={this.mySynth} />
+                </BottomDrawerTab>
+              </BottomDrawer>
+            </div>
+        );
+    }
+}
 
 const mapStateToProps = (state, ownProps) => ({
     tracks: state.tracks
