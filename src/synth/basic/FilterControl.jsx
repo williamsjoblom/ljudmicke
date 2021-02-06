@@ -8,6 +8,7 @@ import { setSynthOscillatorParams, setSynthParams } from '../../actions';
 import {
     KNOB_WRAPPER_STYLE,
     KNOB_WRAPPER_TEXT_STYLE,
+    SELECT_STYLE,
     KNOB_SIZE,
 } from './common';
 
@@ -17,13 +18,24 @@ class FilterControl extends React.Component  {
                  <span style={KNOB_WRAPPER_TEXT_STYLE}>
                    {this.props.name}
                  </span>
+                 <select value={this.props.params.type}
+                         style={SELECT_STYLE}
+                         onChange={e => {
+                             const t = e.target.value;
+                             this.props.setType(t);
+                             this.props.filter.type = t;
+                         }}>
+                   <option value={'lowpass'}>LOW</option>
+                   <option value={'highpass'}>HIGH</option>
+                   <option value={'bandpass'}>BAND</option>
+                 </select>
                  <ParamKnob width={KNOB_SIZE} height={KNOB_SIZE}
                             decimals={0}
                             value={this.props.params.cutoff}
                             label={'cutoff'}
                             log
                             min={10}
-                            max={10000}
+                            max={20000}
                             unit={'Hz'}
                             param={this.props.filterGain.gain}
                             style={{marginBottom: '8px'}}
@@ -57,6 +69,9 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
+    setType: t => dispatch(setSynthParams(
+        ownProps.synthId, { filter: { type: t } }
+    )),
     setCutoff: f => dispatch(setSynthParams(
         ownProps.synthId, { filter: { cutoff: f } }
     )),

@@ -27,9 +27,10 @@ class BasicSynthComponent extends React.Component {
         super(props);
     }
 
-
     render() {
-        return <div>
+        return <div style={{
+            backgroundColor: Colors.bgDarker
+        }}>
                  <OscillatorControl name={'OSC 1'}
                                     synthId={0}
                                     oscillatorId={0}
@@ -63,27 +64,6 @@ class BasicSynthComponent extends React.Component {
                                   synthId={0}
                                   envelopeId={1}
                                   envelope={this.props.synth.ampEnvelope}/>
-
-                 {/* <EnvelopeControl name={'FILT-EG'} */}
-                 {/*                  color={'#90BE6D'} */}
-                 {/*                  attack={this.props.params.filterAttack} */}
-                 {/*                  setAttack={v => this.props.setParam({filterAttack: v})} */}
-                 {/*                  decay={this.props.params.filterDecay} */}
-                 {/*                  setDecay={v => this.props.setParam({filterDecay: v})} */}
-                 {/*                  sustain={this.props.params.filterSustain} */}
-                 {/*                  setSustain={v => this.props.setParam({filterSustain: v})} */}
-                 {/*                  release={this.props.params.filterRelease} */}
-                 {/*                  setRelease={v => this.props.setParam({filterRelease: v})}/> */}
-                 {/* <EnvelopeControl name={'AMP-EG'} */}
-                 {/*                  color={'#277DA1'} */}
-                 {/*                  attack={this.props.params.ampAttack} */}
-                 {/*                  setAttack={v => this.props.setParam({ampAttack: v})} */}
-                 {/*                  decay={this.props.params.ampDecay} */}
-                 {/*                  setDecay={v => this.props.setParam({ampDecay: v})} */}
-                 {/*                  sustain={this.props.params.ampSustain} */}
-                 {/*                  setSustain={v => this.props.setParam({ampSustain: v})} */}
-                 {/*                  release={this.props.params.ampRelease} */}
-                 {/*                  setRelease={v => this.props.setParam({ampRelease: v})}/> */}
                </div>;
     }
 }

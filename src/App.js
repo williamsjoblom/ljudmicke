@@ -24,7 +24,7 @@ import * as Keyboard from './keyboard';
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.mySynth = new BasicSynth();
+        this.mySynth = new BasicSynth(this.props.synthParams);
 
         this.onMIDI = this.onMIDI.bind(this);
     }
@@ -76,7 +76,8 @@ class App extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-    tracks: state.tracks
+    tracks: state.tracks,
+    synthParams: state.synths[0].params,
 });
 const mapDispatchToProps = (dispatch) => ({ });
 

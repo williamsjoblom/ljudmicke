@@ -5,6 +5,8 @@ import { clamp, lerp, invlerp } from '../math';
 
 const SENSITIVITY = 0.005;
 
+
+
 class Knob extends React.Component {
     static defaultProps = {
         min: 0,
@@ -167,7 +169,7 @@ class Knob extends React.Component {
         ctxt.beginPath();
         ctxt.moveTo(centerX, centerY);
         ctxt.arc(centerX, centerY, radius, startAngle, endAngle);
-        ctxt.fillStyle = "gray";
+        ctxt.fillStyle = Colors.bgLighter;
         ctxt.closePath();
         ctxt.fill();
 
@@ -187,14 +189,9 @@ class Knob extends React.Component {
         // Draw actual knob.
         ctxt.beginPath();
         ctxt.arc(centerX, centerY, 0.8*radius, 0, 2*Math.PI);
-
-        let wheelGradient = ctxt.createRadialGradient(centerX, centerY,
-                                                      Math.max(radius*0.85, radius - 10),
-                                                      centerX, centerY, radius);
-        wheelGradient.addColorStop("0", "#2D2D2D");
-        wheelGradient.addColorStop("1", "#888888");
-        ctxt.fillStyle = wheelGradient;
+        ctxt.fillStyle = Colors.bgDark;
         ctxt.fill();
+
 
         // Draw dot.
         const dotOffset = 0.5*radius;
@@ -204,13 +201,7 @@ class Knob extends React.Component {
 
         ctxt.beginPath();
         ctxt.arc(dotX, dotY, dotRadius, 0, 2*Math.PI);
-
-        let dotGradient = ctxt.createRadialGradient(dotX, dotY, dotRadius/2,
-                                                    dotX, dotY, dotRadius);
-        dotGradient.addColorStop("0", "#FFFFFF");
-        dotGradient.addColorStop("1", "#999999");
-        ctxt.fillStyle = dotGradient;
-
+        ctxt.fillStyle = Colors.fgPrimary;
         ctxt.fill();
     }
 

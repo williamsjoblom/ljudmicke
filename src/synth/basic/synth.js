@@ -9,33 +9,55 @@ const transposeNoteBySemitones = (note, semitones) => {
     return f*Math.pow(a, semitones);
 };
 
+const makeOscillatorOptions = (params) => ({
+    type: params.waveform,
+    detune: params.detune,
+});
+
+const makeEnvelopeOptions = (params) => ({
+    attack: params.attack,
+    decay: params.decay,
+    sustain: params.sustain,
+    release: params.release,
+});
+
+const makeFilterOptions = (params) => ({
+    type: params.type,
+    Q: params.resonance,
+});
+
 //NOTE: Based on 'yellow' preset from https://subtract.one/
 class BasicSynth  {
     constructor(params) {
-        const oscillatorOptions = {
-            type: 'sine',
-        };
-
         this.semiTones = 0;
 
         this.compressor = new Tone.Compressor().toDestination();
-        this.ampEnvelope = new Tone.AmplitudeEnvelope().connect(this.compressor);
+        this.ampEnvelope = new Tone.AmplitudeEnvelope(
+            makeEnvelopeOptions(params.envelopes[1])
+        ).connect(this.compressor);
 
-        this.filter = new Tone.BiquadFilter({type: 'lowpass'}).connect(this.ampEnvelope);
-        this.filterGain = new Tone.Gain().connect(this.filter.frequency);
-        this.filterEnvelope = new Tone.Envelope().connect(this.filterGain);
+        this.filter = new Tone.BiquadFilter(
+            makeFilterOptions(params.filter)
+        ).connect(this.ampEnvelope);
 
-        this.oscillatorGains = [
-            new Tone.Gain().connect(this.filter),
-            new Tone.Gain().connect(this.filter),
-            new Tone.Gain().connect(this.filter),
-        ];
+        this.filterGain = new Tone.Gain(
+            params.filter.cutoff
+        ).connect(this.filter.frequency);
 
-        this.oscillators = [
-            new Tone.OmniOscillator(oscillatorOptions).connect(this.oscillatorGains[0]),
-            new Tone.OmniOscillator(oscillatorOptions).connect(this.oscillatorGains[1]),
-            new Tone.OmniOscillator(oscillatorOptions).connect(this.oscillatorGains[2]),
-        ];
+        this.filterEnvelope = new Tone.Envelope(
+            makeEnvelopeOptions(params.envelopes[0])
+        ).connect(this.filterGain);
+
+        this.oscillatorGains = params.oscillators.map(param =>
+            new Tone.Gain(param.gain).connect(this.filter)
+        );
+
+        this.oscillators = params.oscillators.map((param, i) =>
+            new Tone.OmniOscillator(
+                makeOscillatorOptions(param)
+            ).connect(this.oscillatorGains[i])
+        );
+
         this.oscillators.forEach(osc => osc.semitones = 0);
 
         const now = Tone.now();

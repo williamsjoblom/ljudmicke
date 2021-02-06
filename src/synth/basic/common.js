@@ -8,6 +8,7 @@ export const KNOB_WRAPPER_STYLE = {
     border: `1px solid ${Colors.bgLighter}`,
     margin: '4px',
     width: '80px',
+    backgroundColor: Colors.bgDark,
 };
 
 export const KNOB_WRAPPER_TEXT_STYLE = {
@@ -22,6 +23,20 @@ export const KNOB_WRAPPER_TEXT_STYLE = {
     marginBottom: '8px',
     fontSize: '9pt',
     width: '60px',
+};
+
+export const SELECT_STYLE = {
+    textAlign: 'right',
+    padding: '3px 0px',
+    margin: 'auto',
+    border: 0,
+    width: '60px',
+    fontWeight: '500',
+    fontFamily: 'Maven Pro',
+    fontSize: '9pt',
+    backgroundColor: Colors.bgLighter,
+    color: Colors.fgSecondary,
+    marginBottom: '8px',
 };
 
 export const KNOB_SIZE = 40;
