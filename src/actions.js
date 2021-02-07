@@ -52,6 +52,10 @@ export const setBeatsPerMinute = bpm => ({
     bpm: bpm,
 });
 
+export const addPattern = () => ({
+    type: 'ADD_PATTERN',
+});
+
 export const setPatternToPaint = id => ({
     type: 'SET_PATTERN_TO_PAINT',
     id: id,

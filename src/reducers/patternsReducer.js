@@ -1,18 +1,19 @@
+const Pattern = (id) => ({
+    name: `Pattern ${id + 1}`,
+    id,
+    notes: [],
+});
+
 const initialPatterns = [
-    {
-        name: "Pattern 1",
-        id: 0,
-        notes: [ ],
-    },
-    {
-        name: "Pattern 2",
-        id: 1,
-        notes: [ ],
-    },
+    Pattern(0),
 ];
 
 const patternsReducer = (patterns=initialPatterns, action) => {
     switch(action.type) {
+    case 'ADD_PATTERN':
+        return patterns.concat(
+            Pattern(patterns.length)
+        );
     case 'ADD_NOTE':
         return patterns.map(pattern => {
             if (pattern.id !== action.patternId) return pattern;

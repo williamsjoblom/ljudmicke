@@ -13,7 +13,7 @@ import * as MIDI from '../midi';
 import * as Colors from '../colors';
 
 import Note from '../note';
-import { addNote, setNotePosition, setPatternToEdit } from '../actions';
+import { addNote, addPattern, setNotePosition, setPatternToEdit } from '../actions';
 
 import { mdiPiano } from '@mdi/js';
 
@@ -211,7 +211,13 @@ class PianoRoll extends React.Component {
     }
 
     onChangePatternToEdit(event) {
-        this.props.setPatternToEdit(+event.target.value);
+        if (event.target.value === 'add') {
+            const patternCount = this.props.patterns.length;
+            this.props.addPattern();
+            this.props.setPatternToEdit(patternCount);
+        } else {
+            this.props.setPatternToEdit(+event.target.value);
+        }
     }
 
     render() {
@@ -241,6 +247,9 @@ class PianoRoll extends React.Component {
                           </option>
                       )
                   }
+                  <option key={-1} value={'add'}>
+                    Add pattern...
+                  </option>
                 </select>
               </LabeledInput>
             </StickyHeader>,
@@ -294,6 +303,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
         setNotePosition(ownProps.patternId, note.id, position, key)
     ),
     setPatternToEdit: id => dispatch(setPatternToEdit(id)),
+    addPattern: () => dispatch(addPattern()),
 });
 
 PianoRoll = connect(
