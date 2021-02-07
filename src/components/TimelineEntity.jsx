@@ -5,6 +5,7 @@ import Color from 'color';
 import { editEntity,
          setEntityPosition,
          setEntityDuration } from '../actions';
+import styled from 'styled-components';
 
 /**
  * Get drag action given mouse event.
@@ -17,6 +18,24 @@ const getDragAction = (event) => {
         return 'move';
     }
 };
+
+const NameLabel = styled.p`
+    position: absolute;
+    margin: 0 0px;
+    color: ${props => props.color};
+    width: ${props => props.width}px;
+    font-family: Roboto Mono;
+    font-size: 10pt;
+    background-color: rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    user-select: none;
+    font-weight: 500;
+    text-align: left;
+    padding: 0 4px;
+    z-index: 300;
+`;
 
 export default class TimelineEntity extends React.Component {
 
@@ -38,6 +57,8 @@ export default class TimelineEntity extends React.Component {
 
     onClick(event) {
         event.stopPropagation();
+        // WARNING: We also use a doubleclick handler, so if things
+        // need to be added here, think it through!
     }
 
     onRightClick(event) {
@@ -116,7 +137,7 @@ export default class TimelineEntity extends React.Component {
 
         const style = {
             border: '1px solid black',
-            borderRadius: '3px',
+            borderRadius: '0px',
             height: '100px',
             marginTop: '4px',
             marginBottom: '4px',
@@ -131,19 +152,12 @@ export default class TimelineEntity extends React.Component {
                     onMouseDown={this.onMouseDown}
                     onMouseMove={this.onMouseMove}
                     onClick={this.onClick}
+                    onDoubleClick={this.props.onDoubleClick}
                     onContextMenu={this.onRightClick}>
-                 <p style={{position:'absolute',
-                            margin: '0 2px',
-                            color: Color(this.props.color).darken(0.75),
-                            width: pxWidth + 'px',
-                            overflow: 'hidden',
-                            whiteSpace: 'nowrap',
-                            textOverflow: 'ellipsis',
-                            userSelect: 'none',
-                            fontWeight: '500',
-                            }}>
+                 <NameLabel color={Color(this.props.color).darken(0.75)}
+                            width={pxWidth}>
                    {this.props.entity.name}
-                 </p>
+                 </NameLabel>
                  { this.props.children }
                </div>;
     }

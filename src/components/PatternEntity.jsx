@@ -4,12 +4,14 @@ import { connect } from 'react-redux';
 
 import TimelineEntity from './TimelineEntity';
 import { fgTimelineEntity } from '../colors';
+import { setPatternToEdit } from '../actions';
 
 class PatternEntity extends React.Component {
     constructor(props) {
         super(props);
         this.canvasRef = React.createRef();
         this.draw = this.draw.bind(this);
+        this.onDoubleClick = this.onDoubleClick.bind(this);
     }
 
     draw() {
@@ -42,6 +44,10 @@ class PatternEntity extends React.Component {
         });
     }
 
+    onDoubleClick() {
+        this.props.setAsPatternToEdit();
+    }
+
     componentDidMount() {
         this.draw();
     }
@@ -51,7 +57,8 @@ class PatternEntity extends React.Component {
     }
 
     render() {
-        return <TimelineEntity {...this.props}>
+        return <TimelineEntity {...this.props}
+                               onDoubleClick={this.onDoubleClick}>
                  <canvas ref={this.canvasRef}
                          width={this.props.entity.duration*this.props.pixelsPerSecond}
                          style={{ position: 'relative',
@@ -68,8 +75,13 @@ const mapStateToProps = (state, ownProps) => ({
     pattern: state.patterns[state.tracks[ownProps.trackId].entities[ownProps.id].patternKey],
 });
 
+const mapDispatchToProps = (dispatch, ownProps) => ({
+    setAsPatternToEdit: () => dispatch(setPatternToEdit(ownProps.id)),
+});
+
 PatternEntity = connect(
     mapStateToProps,
+    mapDispatchToProps,
 )(PatternEntity);
 
 export default PatternEntity;
