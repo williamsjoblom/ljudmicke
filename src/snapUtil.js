@@ -17,5 +17,5 @@ export const snapToSubdivision = (positionInSeconds, beatsPerMinute, pixelsPerSe
     const beatSubdivisions = subdivisionsPerBeat(beatsPerMinute, pixelsPerSecond);
     const secondsPerSubdivision = secondsPerBeat / beatSubdivisions;
 
-    return Math.round(positionInSeconds / secondsPerSubdivision) * secondsPerSubdivision;
+    return Math.floor(positionInSeconds / secondsPerSubdivision) * secondsPerSubdivision;
 };
