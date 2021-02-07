@@ -14,7 +14,6 @@ class ParamFader extends React.Component {
     }
 
     setValue(value) {
-        console.log('Setting fader param');
         if (Array.isArray(this.props.param)) {
             this.props.param.forEach(
                 param => param.value = value
