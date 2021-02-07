@@ -1,22 +1,9 @@
 import * as Tracks from '../tracks';
+import { AudioTrack, MIDITrack, AutomationTrack } from '../track';
 
 const initialTracks = [
-    {
-        name: "Audio 1",
-        type: "audio",
-        id: 0,
-        volume: 1,
-        pan: 0,
-        entities: [ /*new Entity(0, "foo", 0, 300, undefined)*/ ]
-    },
-    {
-        name: "Synth 1",
-        type: "midi",
-        id: 1,
-        volume: 1,
-        pan: 0,
-        entities: [ ]
-    },
+    AudioTrack("Audio 1", 0),
+    MIDITrack("Synth 1", 0, 0),
 ];
 
 const newTrackName = (trackType, tracks) => {
@@ -27,6 +14,28 @@ const newTrackName = (trackType, tracks) => {
         automation: 'Automation',
     }
     return `${trackTypeName[trackType]} ${n + 1}`;
+};
+
+/**
+ * Construct Track object from the state and a ADD_TRACK action.
+ */
+const makeTrack = (tracks, action) => {
+    console.assert(action.type === 'ADD_TRACK',
+                   'Can only construct Track from ADD_TRACK actions');
+    const name = action.name
+            ? action.name
+            : newTrackName(action.trackType, tracks);
+
+    switch (action.trackType) {
+    case 'audio':
+        return AudioTrack(name, tracks.length);
+    case 'midi':
+        return MIDITrack(name, tracks.length, 0);
+    case 'automation':
+        return AutomationTrack(name, tracks.length);
+    default:
+        console.error(`Unknown track type: '${action.trackType}'`);
+    }
 };
 
 const tracksReducer = (tracks=initialTracks, action) => {
@@ -64,17 +73,8 @@ const tracksReducer = (tracks=initialTracks, action) => {
             ? action.name
             : newTrackName(action.trackType, tracks);
 
-        const track = {
-            name: name,
-            type: action.trackType,
-            id: tracks.length,
-            volume: 1,
-            pan: 0,
-            entities: [ ]
-        };
-
-        // FIXME: breaks reducer purity, pls fix
-        Tracks.addTrack(track);
+        let track = makeTrack(tracks, action);
+        Tracks.addTrack(track); // FIXME: breaks reducer purity
         return tracks.concat(track);
     case 'SET_VOLUME':
         return tracks.map(track => {
