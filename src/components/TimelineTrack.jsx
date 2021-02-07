@@ -65,13 +65,6 @@ export default class TimelineTrack extends React.Component {
     }
 
     async addEntityFromFile(file, position) {
-        // if (file.type === 'audio/midi') {
-        //     const midi = await readMIDIFile(file);
-        //     console.log(midi.getMidiEvents());
-        //     return;
-        // }
-
-
         const [bufferKey, buffer] = await registerAudioFile(file);
         const id = this.props.track.entities.length;
 
