@@ -38,6 +38,5 @@ if (typeof navigator.requestMIDIAccess === 'function') {
         });
     })
 } else {
-    console.log('Bad browser. No MIDI support.')
+    console.error('Bad browser. No MIDI support.')
 }
-
