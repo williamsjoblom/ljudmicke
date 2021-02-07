@@ -3,7 +3,7 @@ import { AudioTrack, MIDITrack, AutomationTrack } from '../track';
 
 const initialTracks = [
     AudioTrack("Audio 1", 0),
-    MIDITrack("Synth 1", 0, 0),
+    MIDITrack("Synth 1", 1, 0),
 ];
 
 const newTrackName = (trackType, tracks) => {
