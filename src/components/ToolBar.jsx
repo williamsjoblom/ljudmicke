@@ -86,9 +86,10 @@ class ToolBar extends React.Component {
                    <select value={this.props.patternToPaint}
                            onChange={this.onChangePatternToPaint}>
                      {
-                         this.props.patterns.map(pattern =>
-                             <option key={pattern.id} value={pattern.id}>
-                               {pattern.name}
+                         this.props.patterns
+                             .map(pattern =>
+                                 <option key={pattern.id} value={pattern.id}>
+                                   {pattern.name}
                              </option>
                          )
                      }
@@ -99,7 +100,15 @@ class ToolBar extends React.Component {
                                width={160}
                                height={30}>
                    <select>
-                     <option>M-Audio KeyStudio</option>
+                     {
+                         this.props.midiDevices
+                             .reverse()
+                             .map(device =>
+                                 <option>
+                                   {device}
+                                 </option>
+                             )
+                     }
                    </select>
                  </LabeledInput>
                </nav>;
@@ -112,6 +121,7 @@ const mapStateToProps = (state) => ({
     beatsPerMinute: state.timeline.beatsPerMinute,
     playing: state.nonPersistent.playing,
     patternToPaint: state.timeline.patternToPaint,
+    midiDevices: state.nonPersistent.midiDevices,
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

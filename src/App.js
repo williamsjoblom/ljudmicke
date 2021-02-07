@@ -20,6 +20,7 @@ import {
 import * as Tone from 'tone';
 import * as MIDI from './midi';
 import * as Keyboard from './keyboard';
+import { setMIDIDevices } from './actions';
 
 
 class App extends React.Component {
@@ -44,12 +45,21 @@ class App extends React.Component {
 
     componentDidMount() {
 
+        MIDI.getInputDevices()
+            .then(devices => {
+                this.props.setMIDIDevices(
+                    devices.map(device => device.name)
+                );
+            });
+
         Instruments.init(this.props.synths)
             .then(() => {
                 this.setState({ instrumentsReady: true });
                 MIDI.addKeyboardListener(this.onMIDI);
                 Keyboard.addMIDIListener(this.onMIDI);
             });
+
+
     }
 
     componentWillUnmount() {
@@ -95,7 +105,9 @@ const mapStateToProps = (state, ownProps) => ({
     synths: state.synths,
     patternToEdit: state.timeline.patternToEdit,
 });
-const mapDispatchToProps = (dispatch) => ({ });
+const mapDispatchToProps = (dispatch) => ({
+    setMIDIDevices: devices => dispatch(setMIDIDevices(devices)),
+});
 
 App = connect(
     mapStateToProps,

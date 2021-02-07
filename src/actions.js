@@ -124,3 +124,8 @@ export const setPaused = () => ({
 export const setStopped = () => ({
     type: 'STOP',
 });
+
+export const setMIDIDevices = devices => ({
+    type: 'SET_MIDI_DEVICES',
+    devices,
+});
