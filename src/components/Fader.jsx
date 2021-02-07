@@ -61,38 +61,24 @@ class Fader extends React.Component {
         ctxt.strokeStyle = 'white';
         ctxt.stroke();
 
-        const DIVISION_HEIGHT = (height - FADER_HEIGHT) / (DIVISIONS - 1);
+        const DIVISION_HEIGHT = Math.round((height - FADER_HEIGHT) / (DIVISIONS - 1));
         for (let i = 0; i < DIVISIONS; i++) {
             const division_width = i % 5 ? 0 : 9;
 
             ctxt.beginPath();
             ctxt.moveTo(width/20 + division_width, i*DIVISION_HEIGHT + FADER_HEIGHT/2);
             ctxt.lineTo(0, i*DIVISION_HEIGHT + FADER_HEIGHT/2);
-            ctxt.strokeStyle = 'white';
+            ctxt.strokeStyle = Colors.fgTernary; //'white';
             ctxt.stroke();
         }
 
+        const faderX = Math.round(1/8*width);
+        const faderY = Math.round((1 - this.props.volume)*(height - FADER_HEIGHT));
 
-
-        const faderX = 1/8*width;
-        const faderY = ((1 - this.props.volume)*(height - FADER_HEIGHT)); // - FADER_HEIGHT
-
-        let faderGradient = ctxt.createLinearGradient(faderX + FADER_WIDTH/2, faderY,
-                                                      faderX + FADER_WIDTH/2,
-                                                      faderY + FADER_HEIGHT);
-        faderGradient.addColorStop('0', '#1C1C1C');
-        faderGradient.addColorStop('.99', '#3D3D3D');
-
+        // Draw fader knob line.
         ctxt.beginPath();
-        ctxt.rect(faderX, faderY, FADER_WIDTH, FADER_HEIGHT);
-        ctxt.fillStyle = faderGradient;
-        ctxt.strokeStyle = '#FFFFFF';
-        ctxt.fill();
-
-
-        ctxt.beginPath();
-        ctxt.rect(1/8*width, faderY + FADER_HEIGHT/2 - FADER_LINE/2, FADER_WIDTH, FADER_LINE);
-        ctxt.fillStyle = '#FFFFFF';
+        ctxt.rect(faderX, faderY + FADER_HEIGHT/2 - FADER_LINE/2, FADER_WIDTH, FADER_LINE);
+        ctxt.fillStyle = Colors.fgSecondary; // '#FFFFFF';
         ctxt.fill();
     }
 
