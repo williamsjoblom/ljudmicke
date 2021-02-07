@@ -21,5 +21,5 @@ export const patternDurationInSeconds = (patternOrId) => {
 
 export const emptyPatternDurationInSeconds = () => {
     const secondsPerBeat = 60 / store.getState().timeline.beatsPerMinute;
-    return 2*secondsPerBeat;
+    return 8*secondsPerBeat;
 };
