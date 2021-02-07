@@ -45,7 +45,7 @@ class PatternEntity extends React.Component {
     }
 
     onDoubleClick() {
-        this.props.setAsPatternToEdit();
+        this.props.setAsPatternToEdit(this.props.pattern.id);
     }
 
     componentDidMount() {
@@ -76,7 +76,7 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    setAsPatternToEdit: () => dispatch(setPatternToEdit(ownProps.id)),
+    setAsPatternToEdit: id => dispatch(setPatternToEdit(id)),
 });
 
 PatternEntity = connect(
