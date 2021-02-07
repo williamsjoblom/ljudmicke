@@ -56,6 +56,7 @@ class Mixer extends React.Component {
                                     height={250}
                                     key={track.id}
                                     value={track.volume}
+                                    highlightColor={Colors.timelinePalette[track.id]}
                                     trackId={track.id}
                                     onChange={v => this.props.setVolume(track.id, v)}/>
                            </FaderContainer>

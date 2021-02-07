@@ -48,7 +48,7 @@ class Fader extends React.Component {
             ctxt.rotate(-Math.PI/2);
         }
 
-        const FADER_WIDTH = 5/8 * width;
+        const FADER_WIDTH = Math.round(5/8 * width);
         const FADER_LINE = 3;
 
         // Draw subdivisions.
@@ -63,18 +63,31 @@ class Fader extends React.Component {
             ctxt.stroke();
         }
 
-        // Draw groove.
-        ctxt.beginPath();
-        ctxt.moveTo(width/2, padding);
-        ctxt.lineTo(width/2, (DIVISIONS - 1)*DIVISION_HEIGHT + padding);
-        ctxt.strokeStyle = Colors.fgTernary;
-        ctxt.stroke();
+
 
         const value = this.props.horizontal
               ? this.props.value
               : 1 - this.props.value;
         const faderX = Math.round((width - FADER_WIDTH)/2);
-        const faderY = Math.round(value*(height - 2*padding - 2*FADER_LINE)) + padding - FADER_LINE/2;
+        const faderY = Math.round(value*(height - 2*padding - 2*FADER_LINE) + padding - FADER_LINE/2);
+
+        const activeColor = this.props.highlightColor || Colors.fgTernary;
+        const inactiveColor = Colors.fgTernary;
+
+        // Draw groove.
+        //
+        // NOTE: this is rather nasty, we should really mirror the
+        // canvas after its rotation to avoid more this nastyness.
+        ctxt.beginPath();
+        ctxt.moveTo(width/2, padding);
+        ctxt.lineTo(width/2, faderY);
+        ctxt.strokeStyle = this.props.horizontal ? activeColor : inactiveColor;
+        ctxt.stroke();
+        ctxt.beginPath();
+        ctxt.moveTo(width/2, faderY);
+        ctxt.lineTo(width/2, (DIVISIONS - 1)*DIVISION_HEIGHT + padding);
+        ctxt.strokeStyle = this.props.horizontal ? inactiveColor : activeColor;
+        ctxt.stroke();
 
         // Draw fader knob line.
         ctxt.beginPath();

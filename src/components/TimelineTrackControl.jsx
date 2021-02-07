@@ -126,6 +126,7 @@ class TimelineTrackControl extends React.Component {
                                 paddingTop: '8px'}}>
                      <ParamFader width={130}
                                  height={40}
+                                 highlightColor={this.props.color}
                                  horizontal
                                  value={this.props.volume}
                                  onChange={this.props.setVolume}
