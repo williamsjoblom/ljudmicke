@@ -20,6 +20,14 @@ const getDragAction = (event) => {
     }
 };
 
+const getCursor = (dragAction) => {
+    switch (dragAction) {
+    case 'move': return 'move';
+    case 'resizeRight': return 'ew-resize';
+    default: return 'default';
+    }
+};
+
 const NameLabel = styled.p`
     position: absolute;
     margin: 0 0px;
@@ -84,12 +92,16 @@ export default class TimelineEntity extends React.Component {
         }
         this.dragClientOrigin = event.clientX;
 
+        document.body.style.cursor = getCursor(this.dragAction);
+
         document.addEventListener('mousemove', this.onDrag);
         document.addEventListener('mouseup', this.onMouseUp);
     }
 
     onMouseUp(event) {
         event.stopPropagation();
+
+        document.body.style.cursor = 'default';
 
         document.removeEventListener('mousemove', this.onDrag);
         document.removeEventListener('mouseup', this.onMouseUp);

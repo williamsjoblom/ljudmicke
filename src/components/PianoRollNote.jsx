@@ -20,6 +20,14 @@ const getDragAction = (event) => {
     }
 };
 
+const getCursor = (dragAction) => {
+    switch (dragAction) {
+    case 'move': return 'move';
+    case 'resizeRight': return 'ew-resize';
+    default: return 'default';
+    }
+};
+
 class PianoRollNote extends React.Component {
     constructor(props) {
         super(props);
@@ -83,6 +91,8 @@ class PianoRollNote extends React.Component {
         }
         this.dragClientOrigin = event.clientX;
 
+        document.body.style.cursor = getCursor(this.dragAction);
+
         document.addEventListener('mousemove', this.onDrag, true);
         document.addEventListener('mouseup', this.onMouseUp, true);
     }
@@ -90,6 +100,8 @@ class PianoRollNote extends React.Component {
     onMouseUp(event) {
         event.stopPropagation();
         event.preventDefault();
+
+        document.body.style.cursor = 'default';
 
         document.removeEventListener('mousemove', this.onDrag, true);
         document.removeEventListener('mouseup', this.onMouseUp, true);
