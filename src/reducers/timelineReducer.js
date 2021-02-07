@@ -4,7 +4,7 @@ const initialTimeline = {
     position: 0,
     beatsPerMinute: 120,
     beatsPerBar: 4,
-    patternToPaint: 1,
+    patternToPaint: 0,
 };
 
 const timelineReducer = (timeline=initialTimeline, action) => {
