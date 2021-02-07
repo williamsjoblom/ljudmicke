@@ -112,12 +112,12 @@ class PianoRoll extends React.Component {
             this.keys.push(<div style={getKeyStyle(i)} key={i}>
                              {
                                  lineToKey(i) % 12 === 1
-                                 ? <span style={{
-                                     marginRight: '4px',
-                                     fontStyle: 'italic',
-                                     color: '#A0A0A0',
-                                     fontWeight: 400
-                                 }}>{keyToString(lineToKey(i))}</span>
+                                     ? <span style={{
+                                         marginRight: '4px',
+                                         fontStyle: 'italic',
+                                         color: '#A0A0A0',
+                                         fontWeight: 400
+                                     }}>{keyToString(lineToKey(i))}</span>
                                  : null
                              }
                            </div>);
@@ -208,32 +208,35 @@ class PianoRoll extends React.Component {
             ...makeBackgroundLines(pixelsPerBar, pixelsPerBeat)
         });
 
-        return <div style={{display: 'flex'}}>
-                 <div style={pianoStyle} ref={this.wrapperRef}>
-                   { this.keys }
-                 </div>
-                 <div style={{ flex: '1' }}
-                      ref={this.gridRef}>
-                   {
-                       this.keys.map((key, i) => {
-                           return <div style={divisionStyle(i)}
-                                       onMouseDown={this.onMouseDown}
-                                       onMouseUp={this.onMouseUp}
-                                       key={i}
-                                       onMouseOver={() => this.keyUnderMouse = lineToKey(i)}>
-                                    {
-                                        this.props.pattern.notes
-                                            .filter(note => note.key === lineToKey(i) && !note.markedForRemoval)
-                                            .map(note =>
-                                                <PianoRollNote
-                                                  key={note.id}
-                                                  patternId={this.props.pattern.id}
-                                                  id={note.id} />
-                                            )
-                                    }
-                                  </div>;
-                       })
-                   }
+        return <div>
+                 <div style={{display: 'flex'}}>
+                   <div style={pianoStyle} ref={this.wrapperRef}>
+                     { this.keys }
+                   </div>
+                   <div style={{ flex: '1' }}
+                        ref={this.gridRef}>
+                     {
+                         this.keys.map((key, i) => {
+                             return <div style={divisionStyle(i)}
+                                         onMouseDown={this.onMouseDown}
+                                         onMouseUp={this.onMouseUp}
+                                         key={i}
+                                         onMouseOver={() => this.keyUnderMouse = lineToKey(i)}>
+                                      {
+                                          this.props.pattern.notes
+                                              .filter(note =>
+                                                  note.key === lineToKey(i) && !note.markedForRemoval
+                                              ).map(note =>
+                                                  <PianoRollNote
+                                                    key={note.id}
+                                                    patternId={this.props.pattern.id}
+                                                    id={note.id} />
+                                              )
+                                      }
+                                    </div>;
+                         })
+                     }
+                   </div>
                  </div>
                </div>;
     }
