@@ -14,8 +14,6 @@ import * as Colors from '../colors';
 import Note from '../note';
 import { addNote, setNotePosition } from '../actions';
 
-MIDI.getInputDevices().then(devices => console.log(devices));
-
 const isSharp = (key) => {
     if (key < 0) return false;
     key %= 12; // normalize to single octave

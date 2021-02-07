@@ -30,7 +30,6 @@ const newTrackName = (trackType, tracks) => {
 };
 
 const tracksReducer = (tracks=initialTracks, action) => {
-    console.log(action);
     switch(action.type) {
     case 'ADD_ENTITY':
         return tracks.map(track => {

@@ -38,7 +38,6 @@ class Knob extends React.Component {
     getRotation(value) {
         if (this.props.log) {
             const rot = this.getRotationLog(value);
-            console.log(`${value} => ${rot}`);
             return rot;
         } else
             return this.getRotationLin(value);

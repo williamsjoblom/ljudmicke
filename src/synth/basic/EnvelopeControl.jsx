@@ -24,7 +24,6 @@ class ParamWrapper {
     }
 
     set value(rhs) {
-        console.log(this.obj);
         return this.obj[this.attr] = rhs;
     }
 }
@@ -32,7 +31,6 @@ class ParamWrapper {
 class EnvelopeControl extends React.Component {
 
     render() {
-        console.log(this.props);
         return <div style={KNOB_WRAPPER_STYLE}>
                  <span style={KNOB_WRAPPER_TEXT_STYLE}>
                    {this.props.name}
