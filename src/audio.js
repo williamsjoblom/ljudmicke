@@ -84,9 +84,9 @@ const makeSynth = () => {
 
 const trackEndTime = (track) => {
     return Math.max(
-        ...track.entities.map(
-            entity => entity.position + entity.duration
-        )
+        ...track.entities
+            .filter(entity => !entity.markedForRemoval)
+            .map(entity => entity.position + entity.duration)
     );
 
 };
@@ -94,7 +94,9 @@ const trackEndTime = (track) => {
 const scheduleAudioTrack = (state, track) => {
     const sink = makeTrackSink(track);
 
-    let sources = track.entities.map(entity => {
+    let sources = track.entities
+        .filter(entity => !entity.markedForRemoval)
+        .map(entity => {
         const buffer = getAudioBuffer(entity.bufferKey);
         const player = new Tone.Player(buffer).connect(sink);
         player.sync(); // Sync player with transport.
@@ -108,7 +110,9 @@ const scheduleMidiTrack = (state, track) => {
     synth.connect(sink);
 
     const secondsPerBeat = 60 / state.timeline.beatsPerMinute;
-    track.entities.forEach(entity => {
+    track.entities
+        .filter(entity => !entity.markedForRemoval)
+        .forEach(entity => {
         const pattern = state.patterns[entity.patternKey];
         new Tone.Part((time, value) => {
             synth.triggerAttackRelease(value.note, value.duration,
