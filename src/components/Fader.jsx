@@ -1,24 +1,7 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { setVolume, setPan } from '../actions';
 import * as Colors from '../colors';
 
 const DIVISIONS = 31;
-
-const drawSublines = (ctxt, n, x, y, width, height) => {
-    for (let i = 0; i < n; i++) {
-        ctxt.beginPath();
-        ctxt.rect(1/8*width + 2, y, width - 4, 1);
-        ctxt.fillStyle = "#1C1C1C";
-        ctxt.fill();
-    }
-};
-
-const labelStyle = {
-    display: 'block',
-    color: 'white',
-    fontSize: '12pt'
-};
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -33,9 +16,15 @@ class Fader extends React.Component {
 
     onMouse(event) {
         if (event.type === "mousemove") {
-            const delta = -event.movementY;
-            const volume = clamp(this.props.volume + delta/this.ctxt.canvas.height, 0, 1);
-            this.props.setVolume(volume);
+
+            const delta = this.props.horizontal
+                  ? event.movementX / this.canvasRef.current.width
+                  : -event.movementY / this.canvasRef.current.height;
+
+            const value = clamp(this.props.value + delta, 0, 1);
+            if (this.props.onChange)
+                this.props.onChange(value);
+
         } else if (event.type === "mousedown") {
             event.target.requestPointerLock();
             event.target.addEventListener("mousemove", this.onMouse, true);
@@ -47,39 +36,53 @@ class Fader extends React.Component {
 
     draw() {
         const ctxt = this.ctxt;
-        const [width, height] = [ctxt.canvas.width, ctxt.canvas.height];
 
-        const FADER_WIDTH = 3/4 * width;
-        const FADER_HEIGHT = FADER_WIDTH*1.3;
+        const padding = 2;
+        ctxt.clearRect(0, 0, ctxt.canvas.width, ctxt.canvas.height);
+        const [width, height] = !this.props.horizontal
+              ? [ctxt.canvas.width, ctxt.canvas.height]
+              : [ctxt.canvas.height, ctxt.canvas.width];
+
+        if (this.props.horizontal) {
+            ctxt.translate(0, width);
+            ctxt.rotate(-Math.PI/2);
+        }
+
+        const FADER_WIDTH = 5/8 * width;
         const FADER_LINE = 3;
 
-        ctxt.clearRect(0, 0, width, height);
-
-        ctxt.beginPath();
-        ctxt.moveTo(width/2, FADER_HEIGHT/2);
-        ctxt.lineTo(width/2, height - FADER_HEIGHT/2);
-        ctxt.strokeStyle = 'white';
-        ctxt.stroke();
-
-        const DIVISION_HEIGHT = Math.round((height - FADER_HEIGHT) / (DIVISIONS - 1));
+        // Draw subdivisions.
+        const DIVISION_HEIGHT = Math.round((height - 2*padding) / (DIVISIONS - 1));
         for (let i = 0; i < DIVISIONS; i++) {
             const division_width = i % 5 ? 0 : 9;
 
             ctxt.beginPath();
-            ctxt.moveTo(width/20 + division_width, i*DIVISION_HEIGHT + FADER_HEIGHT/2);
-            ctxt.lineTo(0, i*DIVISION_HEIGHT + FADER_HEIGHT/2);
-            ctxt.strokeStyle = Colors.fgTernary; //'white';
+            ctxt.moveTo(width/20 + division_width, i*DIVISION_HEIGHT + padding);
+            ctxt.lineTo(0, i*DIVISION_HEIGHT + padding);
+            ctxt.strokeStyle = Colors.fgTernary;
             ctxt.stroke();
         }
 
-        const faderX = Math.round(1/8*width);
-        const faderY = Math.round((1 - this.props.volume)*(height - FADER_HEIGHT));
+        // Draw groove.
+        ctxt.beginPath();
+        ctxt.moveTo(width/2, padding);
+        ctxt.lineTo(width/2, (DIVISIONS - 1)*DIVISION_HEIGHT + padding);
+        ctxt.strokeStyle = Colors.fgTernary;
+        ctxt.stroke();
+
+        const value = this.props.horizontal
+              ? this.props.value
+              : 1 - this.props.value;
+        const faderX = Math.round((width - FADER_WIDTH)/2);
+        const faderY = Math.round(value*(height - 2*padding - 2*FADER_LINE)) + padding - FADER_LINE/2;
 
         // Draw fader knob line.
         ctxt.beginPath();
-        ctxt.rect(faderX, faderY + FADER_HEIGHT/2 - FADER_LINE/2, FADER_WIDTH, FADER_LINE);
-        ctxt.fillStyle = Colors.fgSecondary; // '#FFFFFF';
+        ctxt.rect(faderX, faderY, FADER_WIDTH, FADER_LINE);
+        ctxt.fillStyle = Colors.fgSecondary;
         ctxt.fill();
+
+        ctxt.setTransform(1, 0, 0, 1, 0, 0);
     }
 
     componentDidUpdate() {
@@ -92,47 +95,16 @@ class Fader extends React.Component {
     }
 
     render() {
-        const bg = (this.props.trackId % 2) ? Colors.bgDarkest : Colors.bgDarker;
-
-        return <div style={{display: 'inline-block',
-                            padding: '0',
-                            textAlign: 'center',
-                            borderRight: '2px solid ' + Colors.bgDark}}>
-
-                 <div style={{display: 'block',
-                              backgroundColor: Colors.timelinePalette[this.props.track.id],
-                              width: '100%',
-                              height: '10px'}}></div>
-
-                 <div style={{display: 'inline-block',
-                              paddingLeft: '16px',
-                              paddingRight: '16px',
-                              textAlign: 'center',
-                              backgroundColor: bg}}>
-                   <h1 style={labelStyle}>{this.props.track.name}</h1>
-                   <canvas ref={this.canvasRef}
-                           width={this.props.width}
-                           height={this.props.height}
-                           onMouseDown={this.onMouse}
-                           onMouseUp={this.onMouse}
-                           style={{}}></canvas>
-                 </div>
-               </div>;
+        return <canvas ref={this.canvasRef}
+                       width={this.props.width}
+                       height={this.props.height}
+                       onMouseDown={this.onMouse}
+                       onMouseUp={this.onMouse}
+                       style={{
+                           width: this.props.width,
+                           height: this.props.height}}>
+               </canvas>;
     }
 }
-
-const mapStateToProps = (state, ownProps) => ({
-    track: state.tracks[ownProps.trackId],
-    volume: state.tracks[ownProps.trackId].volume,
-});
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-    setVolume: volume => dispatch(setVolume(ownProps.trackId, volume))
-});
-
-Fader = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Fader);
 
 export default Fader;

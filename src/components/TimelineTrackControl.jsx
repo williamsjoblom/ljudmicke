@@ -7,6 +7,7 @@ import { setVolume, setPan } from '../actions';
 import Knob from './Knob';
 import ParamKnob from './ParamKnob';
 import FaButton from './FaButton';
+import ParamFader from './ParamFader';
 
 import * as Colors from '../colors';
 
@@ -123,16 +124,12 @@ class TimelineTrackControl extends React.Component {
                                 flexDirection: 'row',
                                 justifyContent: 'space-around',
                                 paddingTop: '8px'}}>
-                     <ParamKnob width={40}
-                                height={40}
-                                decimal={2}
-                                value={this.props.volume}
-                                highlightColor={this.props.color}
-                                label={'vol'}
-                                min={0}
-                                max={2}
-                                onChange={this.props.setVolume}
-                                param={this.props.volumeParam} />
+                     <ParamFader width={130}
+                                 height={40}
+                                 horizontal
+                                 value={this.props.volume}
+                                 onChange={this.props.setVolume}
+                                 param={this.props.volumeParam} />
 
                      <ParamKnob width={40}
                                 height={40}
