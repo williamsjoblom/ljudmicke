@@ -74,15 +74,16 @@ class App extends React.Component {
                                  resizable>
                   <PianoRoll patternId={0}/>
                 </BottomDrawerTab>
-
-                <BottomDrawerTab name={"Synth"}
-                                 icon={mdiPiano}
-                                 resizable>
-                    {
-                        this.state.instrumentsReady &&
-                        <BasicSynthComponent synth={Instruments.getInstrument(0)} />
-                    }
-                </BottomDrawerTab>
+                  {
+                      this.state.instrumentsReady ?
+                          this.props.synths.map(synth => {
+                              return <BottomDrawerTab name={synth.name}
+                                                      icon={mdiPiano}
+                                                      resizable>
+                                         { Instruments.getInstrument(synth.id).component() }
+                                     </BottomDrawerTab>
+                          }) : null
+                  }
               </BottomDrawer>
             </div>
         );

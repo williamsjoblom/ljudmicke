@@ -102,25 +102,27 @@ export class BottomDrawer extends React.Component {
     }
 
     render() {
+        const children = this.props.children.flat();
         return <div style={STYLE}>
                  <TabBar onMouseDown={this.onMouseDown}>
                    {
-                       this.props.children.map((child, i) => {
-                           const Tab = i == this.state.activeTab
-                                 ? ActiveTab
-                                 : InactiveTab;
-
-                           return <Tab onClick={e => this.onTabClick(e, i)}
-                                       key={i}>
-                                    {child.props.name}
-                                  </Tab>;
+                       children
+                           .filter(child => child && child.type === BottomDrawerTab)
+                           .map((child, i) => {
+                               const Tab = i == this.state.activeTab
+                                     ? ActiveTab
+                                     : InactiveTab;
+                               return <Tab onClick={e => this.onTabClick(e, i)}
+                                           key={i}>
+                                        {child.props.name}
+                                      </Tab>;
                        })
                    }
                  </TabBar>
                  <div style={{...CONTENT_STYLE, 'maxHeight': this.state.maxHeight}}>
                    {
                        this.state.activeTab === -1 ||
-                           this.props.children[this.state.activeTab]
+                           children[this.state.activeTab]
                    }
                  </div>
                </div>;

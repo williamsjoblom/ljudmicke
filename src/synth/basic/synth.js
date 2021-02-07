@@ -143,7 +143,9 @@ class BasicSynth  {
         const now = Tone.now();
         this.oscillators.forEach(osc => osc.start(now));
 
+        this.component = this.component.bind(this);
         this.triggerAttack = this.triggerAttack.bind(this);
+        this.triggerAttackRelease = this.triggerAttackRelease.bind(this);
         this.triggerRelease = this.triggerRelease.bind(this);
         this.connect = this.connect.bind(this);
     }
@@ -157,6 +159,10 @@ class BasicSynth  {
         });
         this.ampEnvelope.triggerAttack(time, velocity);
         this.filterEnvelope.triggerAttack(time, velocity);
+    }
+
+    component() {
+        return <Component synth={this} />
     }
 
     triggerRelease(note, time) {
