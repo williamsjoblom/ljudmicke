@@ -171,7 +171,6 @@ export default class TimelineTrack extends React.Component {
             borderTop: "2px solid " + Colors.bgTrackDivider,
             backgroundColor: (this.props.id % 2) ? Colors.bgDarker : Colors.bgDark,
             position: 'relative',
-            cursor: trackCursor(this.props.track.type),
             ...makeBackgroundLines(pixelsPerBar, pixelsPerBeat / additionalSubdivisions),
         };
 
