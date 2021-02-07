@@ -103,7 +103,7 @@ class BasicSynth  {
         this.semiTones = 0;
 
         // Build compressor.
-        this.compressor = new Tone.Compressor().toDestination();
+        this.compressor = new Tone.Compressor();
 
         // Build amplitude envelope.
         this.ampEnvelope = new Tone.AmplitudeEnvelope(
@@ -145,6 +145,7 @@ class BasicSynth  {
 
         this.triggerAttack = this.triggerAttack.bind(this);
         this.triggerRelease = this.triggerRelease.bind(this);
+        this.connect = this.connect.bind(this);
     }
 
     triggerAttack(note, time, velocity=1) {
@@ -164,7 +165,12 @@ class BasicSynth  {
     }
 
     triggerAttackRelease(note, duration, time, velocity) {
-        this.ampEnvelope.triggerAttackRelease(duration, time, velocity);
+        this.triggerAttack(note, time, velocity);
+        this.triggerRelease(note, time + duration);
+    }
+
+    connect(sink) {
+        this.compressor.connect(sink);
     }
 };
 

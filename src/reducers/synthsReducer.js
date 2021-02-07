@@ -2,7 +2,8 @@ import deepmerge from 'deepmerge';
 
 const initialSynths = [
     {
-        name: "Synth",
+        name: 'Synth',
+        path: 'synth/basic',
         id: 0,
         params: {
             oscillators: [

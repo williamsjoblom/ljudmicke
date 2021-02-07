@@ -10,6 +10,7 @@ import PianoRoll from './components/PianoRoll';
 import Mixer from './components/Mixer';
 import BasicSynthComponent from './synth/basic/Component';
 import BasicSynth from './synth/basic/synth';
+import * as Instruments from './instruments';
 
 import {
     mdiTuneVertical,
@@ -24,7 +25,10 @@ import * as Keyboard from './keyboard';
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.mySynth = new BasicSynth(this.props.synthParams);
+
+        this.state = {
+            instrumentsReady: false,
+        };
 
         this.onMIDI = this.onMIDI.bind(this);
     }
@@ -32,20 +36,27 @@ class App extends React.Component {
     onMIDI(key, velocity) {
         const f = Tone.Midi(key).toFrequency();
         if (velocity > 0) {
-            this.mySynth.triggerAttack(f, Tone.now(), velocity);
+            Instruments.getInstrument(0).triggerAttack(f, Tone.now(), velocity);
         } else {
-            this.mySynth.triggerRelease(f, Tone.now());
+            Instruments.getInstrument(0).triggerRelease(f, Tone.now());
         }
     }
 
     componentDidMount() {
-        MIDI.addKeyboardListener(this.onMIDI);
-        Keyboard.addMIDIListener(this.onMIDI);
+
+        Instruments.init(this.props.synths)
+            .then(() => {
+                this.setState({ instrumentsReady: true });
+                MIDI.addKeyboardListener(this.onMIDI);
+                Keyboard.addMIDIListener(this.onMIDI);
+            });
     }
 
     componentWillUnmount() {
-        MIDI.removeKeyboardListener(this.onMIDI);
-        Keyboard.removeMIDIListener(this.onMIDI);
+        if (this.state.instrumentsReady) {
+            MIDI.removeKeyboardListener(this.onMIDI);
+            Keyboard.removeMIDIListener(this.onMIDI);
+        }
     }
 
     render() {
@@ -67,7 +78,10 @@ class App extends React.Component {
                 <BottomDrawerTab name={"Synth"}
                                  icon={mdiPiano}
                                  resizable>
-                  <BasicSynthComponent synth={this.mySynth} />
+                    {
+                        this.state.instrumentsReady &&
+                        <BasicSynthComponent synth={Instruments.getInstrument(0)} />
+                    }
                 </BottomDrawerTab>
               </BottomDrawer>
             </div>
@@ -77,7 +91,7 @@ class App extends React.Component {
 
 const mapStateToProps = (state, ownProps) => ({
     tracks: state.tracks,
-    synthParams: state.synths[0].params,
+    synths: state.synths,
 });
 const mapDispatchToProps = (dispatch) => ({ });
 

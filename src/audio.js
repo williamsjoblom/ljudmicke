@@ -9,6 +9,7 @@ import { registerAudioBuffer, getAudioBuffer } from './audioStore';
 import * as Tracks from './tracks';
 
 import * as Tone from 'tone';
+import * as Instruments from './instruments';
 import MIDIFile from 'midifile';
 
 /**
@@ -103,7 +104,7 @@ const scheduleAudioTrack = (state, track) => {
 
 const scheduleMidiTrack = (state, track) => {
     const sink = makeTrackSink(track);
-    const synth = makeSynth();
+    const synth = Instruments.getInstrument(track.instrumentId); //makeSynth();
     synth.connect(sink);
 
     const secondsPerBeat = 60 / state.timeline.beatsPerMinute;
