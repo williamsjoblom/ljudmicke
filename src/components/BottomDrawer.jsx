@@ -1,8 +1,11 @@
 import React from 'react';
+import styled from 'styled-components';
+
 import Icon from '@mdi/react';
 import { mdiArrowCollapseDown } from '@mdi/js';
 
 import * as Colors from '../colors';
+
 
 const STYLE = {
     position: 'fixed',
@@ -12,32 +15,36 @@ const STYLE = {
 
 };
 
-const TAB_BAR_STYLE = {
-    display: 'flex',
-    flexDirection: 'row',
-    textAlign: 'left',
-    backgroundColor: Colors.bgDarker,
-    cursor: 'row-resize',
-    borderBottom: '1px solid' + Colors.bgLight
-};
+const TabBar = styled.div`
+    display: flex;
+    flex-direction: row;
+    text-align: left;
+    background-color: ${Colors.bgDarker};
+    cursor: row-resize;
+    border-bottom: 1px solid ${Colors.bgLight};
+`;
 
-const TAB_STYLE = {
-    padding: '4px 8px',
-    backgroundColor: Colors.bgDark,
-    color: Colors.fgPrimary,
-    display: 'inline-flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    fontSize: '10pt',
-    fontWeight: '400',
-    borderRight: '1px solid ' + Colors.bgLight,
-    cursor: 'pointer',
-};
+const InactiveTab = styled.span`
+    padding: 4px 8px;
+    background-color: ${Colors.bgDark};
+    color: ${Colors.fgPrimary};
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 10pt;
+    font-weight: 400;
+    border-right: 1px solid ${Colors.bgLight};
+    cursor: pointer;
+    user-select: none;
+    :hover {
+        background-color: ${Colors.bgLight};
+    }
+`;
 
-const TAB_ACTIVE = {
-    backgroundColor: Colors.bgDarker,
-    color: Colors.fgSecondary,
-};
+const ActiveTab = styled(InactiveTab)`
+    backgroundColor: ${Colors.bgDarker};
+    color: ${Colors.fgSecondary};
+`;
 
 const CONTENT_STYLE = {
     overflowY: 'scroll',
@@ -95,32 +102,21 @@ export class BottomDrawer extends React.Component {
     }
 
     render() {
-        const TAB_ACTIVE_STYLE = {
-            ...TAB_STYLE,
-            ...TAB_ACTIVE,
-        };
-
         return <div style={STYLE}>
-                 <div style={TAB_BAR_STYLE}
-                      onMouseDown={this.onMouseDown}>
+                 <TabBar onMouseDown={this.onMouseDown}>
                    {
-                       this.props.children.map(
-                           (child, i) => <span style={(i === this.state.activeTab) ? TAB_ACTIVE_STYLE : TAB_STYLE}
-                                               onClick={e => this.onTabClick(e, i)}
-                                               key={i}>
-                                           {/* <Icon size={0.75} */}
-                                           {/*       color={Colors.fgSecondary} */}
-                                           {/*       path={child.props.icon}/> */}
-                                           {child.props.name}
-                                         </span>
-                       )
-                   }
-                   {/* <div style={{marginLeft: 'auto', */}
-                   {/*              marginTop: 'auto', */}
-                   {/*              marginBottom: 'auto'}}> */}
+                       this.props.children.map((child, i) => {
+                           const Tab = i == this.state.activeTab
+                                 ? ActiveTab
+                                 : InactiveTab;
 
-                   {/* </div> */}
-                 </div>
+                           return <Tab onClick={e => this.onTabClick(e, i)}
+                                       key={i}>
+                                    {child.props.name}
+                                  </Tab>;
+                       })
+                   }
+                 </TabBar>
                  <div style={{...CONTENT_STYLE, 'maxHeight': this.state.maxHeight}}>
                    {
                        this.state.activeTab === -1 ||
