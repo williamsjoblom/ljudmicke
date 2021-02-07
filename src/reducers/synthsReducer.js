@@ -33,7 +33,7 @@ const initialSynths = [
                 type: 'lowpass',
                 cutoff: 202,
                 envelopeIntensity: 0.36,
-                resonance: 96/4,
+                resonance: 1,
             },
             envelopes: [
                 // Filter:
