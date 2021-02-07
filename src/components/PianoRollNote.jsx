@@ -6,6 +6,7 @@ import * as Colors from '../colors';
 import { setNotePosition,
          setNoteDuration,
          markNoteForRemoval } from '../actions';
+import { snapToSubdivision } from '../snapUtil';
 
 /**
  * Get drag action given mouse event.
@@ -57,8 +58,13 @@ class PianoRollNote extends React.Component {
         let value = this.dragInitialValue + delta;
 
         const snapToBeat = !event.shiftKey;
-        if (snapToBeat) value = Math.round(value);
-
+        if (snapToBeat) {
+            value = snapToSubdivision(
+                value*secondsPerBeat,
+                this.props.beatsPerMinute,
+                this.props.pixelsPerSecond
+            ) / secondsPerBeat;
+        }
         this.dispatchDragAction(value);
     }
 

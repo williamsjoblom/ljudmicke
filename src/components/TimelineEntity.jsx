@@ -6,6 +6,7 @@ import { editEntity,
          setEntityPosition,
          setEntityDuration } from '../actions';
 import styled from 'styled-components';
+import { snapToSubdivision } from '../snapUtil';
 
 /**
  * Get drag action given mouse event.
@@ -107,13 +108,18 @@ export default class TimelineEntity extends React.Component {
         event.stopPropagation();
         event.preventDefault();
 
-        const secondsPerBeat = 60 / this.props.beatsPerMinute;
         const movement = event.clientX - this.dragClientOrigin;
         const delta = movement/(this.props.pixelsPerSecond);
         let value = this.dragInitialValue + delta;
 
         const snapToBeat = !event.shiftKey;
-        if (snapToBeat) value = Math.round(value/secondsPerBeat)*secondsPerBeat;
+        if (snapToBeat) {
+            value = snapToSubdivision(
+                value,
+                this.props.beatsPerMinute,
+                this.props.pixelsPerSecond
+            );
+        }
 
         this.dispatchDragAction(value);
     }

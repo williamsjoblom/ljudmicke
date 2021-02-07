@@ -16,6 +16,7 @@ import Note from '../note';
 import { addNote, addPattern, setNotePosition, setPatternToEdit } from '../actions';
 
 import { mdiPiano } from '@mdi/js';
+import { snapToSubdivision, subdivisionsPerBeat } from '../snapUtil';
 
 const isSharp = (key) => {
     if (key < 0) return false;
@@ -154,11 +155,15 @@ class PianoRoll extends React.Component {
         const bound = this.gridRef.current.getBoundingClientRect();
         const pxPosition = event.clientX - bound.left;
         const position = pxPosition / this.props.pixelsPerSecond;
-        const snapToBeat = !event.shiftKey;
 
         const secondsPerBeat = 60 / this.props.beatsPerMinute;
+        const snapToBeat = !event.shiftKey;
         if (snapToBeat) {
-            return Math.floor(position/secondsPerBeat);
+            return snapToSubdivision(
+                position,
+                this.props.beatsPerMinute,
+                this.props.pixelsPerSecond,
+            ) / secondsPerBeat;
         } else {
             return position/secondsPerBeat;
         }
@@ -192,9 +197,18 @@ class PianoRoll extends React.Component {
 
     onMouseDown(event) {
         const id = this.props.pattern.notes.length;
-        // const key = lineToKey(line);
         const position = this.eventToNotePosition(event);
-        this.props.addNote(Note(id, this.keyUnderMouse, position, 1));
+        this.props.addNote(
+            Note(
+                id,
+                this.keyUnderMouse,
+                position,
+                1 / subdivisionsPerBeat(
+                    this.props.beatsPerMinute,
+                    this.props.pixelsPerSecond,
+                )
+            )
+        );
 
         document.addEventListener('mousemove', this.onDrag);
     }
@@ -224,12 +238,15 @@ class PianoRoll extends React.Component {
         const secondsPerBeat = 60 / this.props.beatsPerMinute;
         const pixelsPerBeat = secondsPerBeat * this.props.pixelsPerSecond;
         const pixelsPerBar = pixelsPerBeat * this.props.beatsPerBar;
+        const additionalSubdivisions = subdivisionsPerBeat(
+            this.props.beatsPerMinute,
+            this.props.pixelsPerSecond);
 
         const divisionStyle = i => ({
             position: 'relative',
             height: LINE_HEIGHT + 'px',
             backgroundColor: i % 2 ? Colors.bgDarker : Colors.bgDark,
-            ...makeBackgroundLines(pixelsPerBar, pixelsPerBeat)
+            ...makeBackgroundLines(pixelsPerBar, pixelsPerBeat / additionalSubdivisions)
         });
 
         return [

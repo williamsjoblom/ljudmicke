@@ -8,6 +8,7 @@ import PatternEntity from './PatternEntity';
 import { readMIDIFile } from '../audio';
 import { registerAudioFile } from '../audioStore';
 import { makeBackgroundLines } from '../cssUtil';
+import { snapToSubdivision, subdivisionsPerBeat } from '../snapUtil';
 import * as Colors from '../colors';
 
 const componentFromEntityType = (type) => {
@@ -32,6 +33,8 @@ const trackCursor = (trackType) => {
         return null;
     }
 };
+
+
 
 export default class TimelineTrack extends React.Component {
     constructor(props) {
@@ -128,14 +131,18 @@ export default class TimelineTrack extends React.Component {
     onClick(event) {
         if (this.props.track.type !== 'midi') return;
 
-        const secondsPerBeat = 60 / this.props.beatsPerMinute;
         const timelineBound = this.timelineRef.current.getBoundingClientRect();
         const pxPosition = event.clientX - timelineBound.left;
         let position = pxPosition/this.props.pixelsPerSecond;
 
         const snapToBeat = !event.shiftKey;
-        if (snapToBeat)
-            position = Math.round(position/secondsPerBeat)*secondsPerBeat;
+        if (snapToBeat) {
+            position = snapToSubdivision(
+                position,
+                this.props.beatsPerMinute,
+                this.props.pixelsPerSecond
+            );
+        }
 
         const duration = 10;
 
@@ -151,8 +158,12 @@ export default class TimelineTrack extends React.Component {
 
     render() {
         const secondsPerBeat = 60 / this.props.beatsPerMinute;
+
         const pixelsPerBeat = secondsPerBeat * this.props.pixelsPerSecond;
         const pixelsPerBar = pixelsPerBeat * this.props.beatsPerBar;
+        const additionalSubdivisions = subdivisionsPerBeat(
+            this.props.beatsPerMinute,
+            this.props.pixelsPerSecond);
 
         const style = {
             height: '110px',
@@ -161,7 +172,7 @@ export default class TimelineTrack extends React.Component {
             backgroundColor: (this.props.id % 2) ? Colors.bgDarker : Colors.bgDark,
             position: 'relative',
             cursor: trackCursor(this.props.track.type),
-            ...makeBackgroundLines(pixelsPerBar, pixelsPerBeat),
+            ...makeBackgroundLines(pixelsPerBar, pixelsPerBeat / additionalSubdivisions),
         };
 
         return <div style={style}
