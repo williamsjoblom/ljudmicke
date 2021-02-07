@@ -104,6 +104,32 @@ const scheduleAudioTrack = (state, track) => {
     });
 };
 
+const notesToPlay = (pattern, entity, secondsPerBeat) => {
+    const duration = entity.duration;
+    const playedNotes = (note) => {
+        const positionInSeconds = note.position*secondsPerBeat;
+        return !note.markedForRemoval && positionInSeconds <= duration;
+    }
+
+    const cutToDuration = (note) => {
+        const positionInSeconds = note.position*secondsPerBeat;
+        const durationInSeconds = note.duration*secondsPerBeat;
+        const overshoot = (positionInSeconds + durationInSeconds) - duration;
+        console.log(overshoot);
+        if (overshoot > 0) {
+            const newNote = Object.assign({}, note);
+            newNote.duration -= overshoot/secondsPerBeat;
+            return newNote;
+        } else {
+            return note;
+        }
+    }
+
+    return pattern.notes
+        .filter(playedNotes)
+        .map(cutToDuration);
+}
+
 const scheduleMidiTrack = (state, track) => {
     const sink = makeTrackSink(track);
     const synth = Instruments.getInstrument(track.instrumentId); //makeSynth();
@@ -113,18 +139,22 @@ const scheduleMidiTrack = (state, track) => {
     track.entities
         .filter(entity => !entity.markedForRemoval)
         .forEach(entity => {
-        const pattern = state.patterns[entity.patternKey];
-        new Tone.Part((time, value) => {
-            synth.triggerAttackRelease(value.note, value.duration,
-                                       time, value.velocity);
-        }, pattern.notes.filter(note => !note.markedForRemoval).map(note => {
-            return { time: note.position*secondsPerBeat,
-                     note: freq(note.key),
-                     velocity: note.velocity,
-                     duration: note.duration*secondsPerBeat,
-                   };
-        })).start(entity.position);
-    });
+            const pattern = state.patterns[entity.patternKey];
+            new Tone.Part(
+                (time, value) => {
+                    synth.triggerAttackRelease(value.note, value.duration,
+                                               time, value.velocity);
+                },
+
+                notesToPlay(pattern, entity, secondsPerBeat)
+                    .map(note => ({
+                        time: note.position*secondsPerBeat,
+                        note: freq(note.key),
+                        velocity: note.velocity,
+                        duration: note.duration*secondsPerBeat,
+                    }))
+            ).start(entity.position);
+        });
 };
 
 const trackScheduler = (trackType) => {
