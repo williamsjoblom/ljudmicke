@@ -14,11 +14,14 @@ export const removeKeyboardListener = (fn) => {
 };
 
 export const getInputDevices = async () => {
-    const access = await navigator.requestMIDIAccess();
-    return Array.from(access.inputs.values());
+    if (typeof navigator.requestMIDIAccess === 'function') {
+        const access = await navigator.requestMIDIAccess();
+        return Array.from(access.inputs.values());
+    } else return []
 };
 
-navigator.requestMIDIAccess()
+if (typeof navigator.requestMIDIAccess === 'function') {
+    navigator.requestMIDIAccess()
     .then(access => {
         access.inputs.forEach(input => {
             input.onmidimessage = (m) => {
@@ -33,4 +36,8 @@ navigator.requestMIDIAccess()
                 }
             };
         });
-    });
+    })
+} else {
+    console.log('Bad browser. No MIDI support.')
+}
+
