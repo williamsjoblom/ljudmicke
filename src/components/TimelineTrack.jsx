@@ -128,9 +128,14 @@ export default class TimelineTrack extends React.Component {
     onClick(event) {
         if (this.props.track.type !== 'midi') return;
 
+        const secondsPerBeat = 60 / this.props.beatsPerMinute;
         const timelineBound = this.timelineRef.current.getBoundingClientRect();
         const pxPosition = event.clientX - timelineBound.left;
-        const position = pxPosition/this.props.pixelsPerSecond;
+        let position = pxPosition/this.props.pixelsPerSecond;
+
+        const snapToBeat = !event.shiftKey;
+        if (snapToBeat)
+            position = Math.round(position/secondsPerBeat)*secondsPerBeat;
 
         const duration = 10;
 
