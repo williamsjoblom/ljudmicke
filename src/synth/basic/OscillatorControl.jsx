@@ -77,7 +77,7 @@ class OscillatorControl extends React.Component {
                             origin={0}
                             style={{marginBottom: '8px'}}
                             onChange={this.props.setGain}
-                            param={this.props.gain.gain} />
+                            param={this.props.gain} />
            </div>;
     }
 }
