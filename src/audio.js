@@ -94,13 +94,13 @@ const trackEndTime = (track) => {
 const scheduleAudioTrack = (state, track) => {
     const sink = makeTrackSink(track);
 
-    let sources = track.entities
+    track.entities
         .filter(entity => !entity.markedForRemoval)
         .map(entity => {
-        const buffer = getAudioBuffer(entity.bufferKey);
-        const player = new Tone.Player(buffer).connect(sink);
-        player.sync(); // Sync player with transport.
-        player.start(entity.position);
+            const buffer = getAudioBuffer(entity.bufferKey);
+            const player = new Tone.Player(buffer).connect(sink);
+            player.sync(); // Sync player with transport.
+            player.start(entity.position);
     });
 };
 
