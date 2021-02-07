@@ -1,18 +1,21 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as Tone from 'tone';
+import styled from 'styled-components';
 
 import { uniqueId } from '../id';
 import { freq } from '../audio';
 
 import { makeBackgroundLines } from '../cssUtil';
 import PianoRollNote from './PianoRollNote';
-import TimelineAxis from './TimelineAxis';
+import LabeledInput from './LabeledInput';
 import * as MIDI from '../midi';
 import * as Colors from '../colors';
 
 import Note from '../note';
-import { addNote, setNotePosition } from '../actions';
+import { addNote, setNotePosition, setPatternToEdit } from '../actions';
+
+import { mdiPiano } from '@mdi/js';
 
 const isSharp = (key) => {
     if (key < 0) return false;
@@ -77,6 +80,18 @@ const pianoStyle = {
     width: '108px',
 };
 
+const StickyHeader = styled.div`
+    position: sticky;
+    background: ${Colors.bgDarker};
+    top: 0;
+    left: 0;
+
+    height: 30px;
+    flex: 0;
+    z-index: 1000;
+    text-align: left;
+`;
+
 const KEYS_PER_OCTAVE = 12;
 const FIRST_OCTAVE = 1;
 const OCTAVES = 5;
@@ -125,6 +140,7 @@ class PianoRoll extends React.Component {
 
         this.keyUnderMouse = 0;
 
+        this.onChangePatternToEdit = this.onChangePatternToEdit.bind(this);
         this.eventToNotePosition = this.eventToNotePosition.bind(this);
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
@@ -169,12 +185,10 @@ class PianoRoll extends React.Component {
 		partials: [0, 2, 3, 4],
 	    }
 	}).toDestination();
-        // MIDI.addKeyboardListener(this.onMIDI);
+        console.log(this.props);
     }
 
-    componentWillUnmount() {
-        // MIDI.removeKeyboardListener(this.onMIDI);
-    }
+    componentWillUnmount() { }
 
     onMouseDown(event) {
         const id = this.props.pattern.notes.length;
@@ -196,6 +210,10 @@ class PianoRoll extends React.Component {
         this.props.setNotePosition(note, position, this.keyUnderMouse);
     }
 
+    onChangePatternToEdit(event) {
+        this.props.setPatternToEdit(+event.target.value);
+    }
+
     render() {
         const secondsPerBeat = 60 / this.props.beatsPerMinute;
         const pixelsPerBeat = secondsPerBeat * this.props.pixelsPerSecond;
@@ -208,37 +226,55 @@ class PianoRoll extends React.Component {
             ...makeBackgroundLines(pixelsPerBar, pixelsPerBeat)
         });
 
-        return <div>
-                 <div style={{display: 'flex'}}>
-                   <div style={pianoStyle} ref={this.wrapperRef}>
-                     { this.keys }
-                   </div>
-                   <div style={{ flex: '1' }}
-                        ref={this.gridRef}>
-                     {
-                         this.keys.map((key, i) => {
-                             return <div style={divisionStyle(i)}
-                                         onMouseDown={this.onMouseDown}
-                                         onMouseUp={this.onMouseUp}
-                                         key={i}
-                                         onMouseOver={() => this.keyUnderMouse = lineToKey(i)}>
-                                      {
-                                          this.props.pattern.notes
-                                              .filter(note =>
-                                                  note.key === lineToKey(i) && !note.markedForRemoval
-                                              ).map(note =>
-                                                  <PianoRollNote
-                                                    key={note.id}
-                                                    patternId={this.props.pattern.id}
-                                                    id={note.id} />
-                                              )
-                                      }
-                                    </div>;
-                         })
-                     }
-                   </div>
-                 </div>
-               </div>;
+        return [
+            <StickyHeader>
+              <LabeledInput value={"Pattern 1"}
+                            icon={mdiPiano}
+                            width={150}
+                            height={30}>
+                <select value={this.props.patternId}
+                        onChange={this.onChangePatternToEdit}>
+                  {
+                      this.props.patterns.map(pattern =>
+                          <option key={pattern.id} value={pattern.id}>
+                            {pattern.name}
+                          </option>
+                      )
+                  }
+                </select>
+              </LabeledInput>
+            </StickyHeader>,
+            <div style={{display: 'flex'}}>
+
+              <div style={pianoStyle} ref={this.wrapperRef}>
+                { this.keys }
+              </div>
+              <div style={{ flex: '1' }}
+                   ref={this.gridRef}>
+                {
+                this.keys.map((key, i) => {
+                    return <div style={divisionStyle(i)}
+                                onMouseDown={this.onMouseDown}
+                                onMouseUp={this.onMouseUp}
+                                key={i}
+                                onMouseOver={() => this.keyUnderMouse = lineToKey(i)}>
+                             {
+                                 this.props.pattern.notes
+                                     .filter(note =>
+                                         note.key === lineToKey(i) && !note.markedForRemoval
+                                     ).map(note =>
+                                         <PianoRollNote
+                                           key={note.id}
+                                           patternId={this.props.patternId}
+                                           id={note.id} />
+                                     )
+                             }
+                           </div>;
+                })
+                }
+              </div>
+            </div>
+        ];
     }
 }
 
@@ -247,11 +283,17 @@ const mapStateToProps = (state, ownProps) => ({
     beatsPerMinute: state.timeline.beatsPerMinute,
     beatsPerBar: state.timeline.beatsPerBar,
     pattern: state.patterns[ownProps.patternId],
+    patterns: state.patterns,
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    addNote: note => dispatch(addNote(ownProps.patternId, note)),
-    setNotePosition: (note, position, key) => dispatch(setNotePosition(ownProps.patternId, note.id, position, key)),
+    addNote: note => dispatch(
+        addNote(ownProps.patternId, note)
+    ),
+    setNotePosition: (note, position, key) => dispatch(
+        setNotePosition(ownProps.patternId, note.id, position, key)
+    ),
+    setPatternToEdit: id => dispatch(setPatternToEdit(id)),
 });
 
 PianoRoll = connect(

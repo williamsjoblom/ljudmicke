@@ -5,6 +5,7 @@ const initialTimeline = {
     beatsPerMinute: 120,
     beatsPerBar: 4,
     patternToPaint: 0,
+    patternToEdit: 0,
 };
 
 const timelineReducer = (timeline=initialTimeline, action) => {
@@ -28,6 +29,11 @@ const timelineReducer = (timeline=initialTimeline, action) => {
         return {
             ...timeline,
             patternToPaint: action.id,
+        }
+    case 'SET_PATTERN_TO_EDIT':
+        return {
+            ...timeline,
+            patternToEdit: action.id
         }
     case 'STOP':
         return {

@@ -72,7 +72,7 @@ class App extends React.Component {
                 <BottomDrawerTab name={"Piano Roll"}
                                  icon={mdiPiano}
                                  resizable>
-                  <PianoRoll patternId={0}/>
+                  <PianoRoll patternId={this.props.patternToEdit}/>
                 </BottomDrawerTab>
                   {
                       this.state.instrumentsReady ?
@@ -93,6 +93,7 @@ class App extends React.Component {
 const mapStateToProps = (state, ownProps) => ({
     tracks: state.tracks,
     synths: state.synths,
+    patternToEdit: state.timeline.patternToEdit,
 });
 const mapDispatchToProps = (dispatch) => ({ });
 

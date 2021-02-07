@@ -57,6 +57,11 @@ export const setPatternToPaint = id => ({
     id: id,
 });
 
+export const setPatternToEdit = id => ({
+    type: 'SET_PATTERN_TO_EDIT',
+    id: id,
+});
+
 export const addNote = (patternId, note) => ({
     type: 'ADD_NOTE',
     patternId: patternId,
