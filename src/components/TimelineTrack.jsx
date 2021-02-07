@@ -50,7 +50,7 @@ export default class TimelineTrack extends React.Component {
         this.onDrag = this.onDrag.bind(this);
         this.onDragEnter = this.onDragEnter.bind(this);
         this.onDragLeave = this.onDragLeave.bind(this);
-        this.onClick = this.onClick.bind(this);
+        this.onMouseDown = this.onMouseDown.bind(this);
         this.addEntityFromFile = this.addEntityFromFile.bind(this);
     }
 
@@ -128,7 +128,7 @@ export default class TimelineTrack extends React.Component {
         }
     }
 
-    onClick(event) {
+    onMouseDown(event) {
         if (this.props.track.type !== 'midi') return;
 
         const timelineBound = this.timelineRef.current.getBoundingClientRect();
@@ -176,7 +176,7 @@ export default class TimelineTrack extends React.Component {
 
         return <div style={style}
                     ref={this.timelineRef}
-                    onClick={this.onClick}>
+                    onMouseDown={this.onMouseDown}>
                  {
                      this.props.track.entities
                          .filter(a => !a.markedForRemoval)
