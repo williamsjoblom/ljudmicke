@@ -23,7 +23,7 @@ const NameLabel = styled.p`
     position: absolute;
     margin: 0 0px;
     color: ${props => props.color};
-    width: ${props => props.width}px;
+    width: ${props => props.width - 8}px;
     font-family: Roboto Mono;
     font-size: 10pt;
     background-color: rgba(0, 0, 0, 0.1);
@@ -33,7 +33,7 @@ const NameLabel = styled.p`
     user-select: none;
     font-weight: 500;
     text-align: left;
-    padding: 0 4px;
+    padding: 0 0 0 8px;
     z-index: 300;
 `;
 
