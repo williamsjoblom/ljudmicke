@@ -8,12 +8,24 @@ class ParamKnob extends React.Component {
         super(props);
 
         this.onChange = this.onChange.bind(this);
-        this.props.param.value = this.props.value;
+        this.setValue = this.setValue.bind(this);
+
+        this.setValue(this.props.value);
+    }
+
+    setValue(value) {
+        if (Array.isArray(this.props.param)) {
+            this.props.param.forEach(
+                param => param.value = value
+            );
+        } else {
+            this.props.param.value = value;
+        }
     }
 
     onChange(value) {
         this.props.onChange(value);
-        this.props.param.value = value;
+        this.setValue(value);
     }
 
     render() {
