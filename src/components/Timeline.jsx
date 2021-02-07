@@ -42,7 +42,7 @@ class Timeline extends React.Component {
         this.setState({
             showAddTrackDropdown: false,
         });
-        this.props.addTrack(type);
+        this.props.addTrack(type, name);
     }
 
     render() {
