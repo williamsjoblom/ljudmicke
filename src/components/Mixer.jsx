@@ -7,7 +7,6 @@ const style = {
     width: '100%',
     textAlign: 'left',
     backgroundColor: Colors.bgDarker,
-    borderTop: '2px solid ' + Colors.bgDark,
     // padding: '16px',
 };
 

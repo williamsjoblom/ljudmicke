@@ -18,6 +18,7 @@ const TAB_BAR_STYLE = {
     textAlign: 'left',
     backgroundColor: Colors.bgDarker,
     cursor: 'row-resize',
+    borderBottom: '1px solid' + Colors.bgLight
 };
 
 const TAB_STYLE = {
