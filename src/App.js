@@ -8,8 +8,6 @@ import ToolBar from './components/ToolBar';
 import Timeline from './components/Timeline';
 import PianoRoll from './components/PianoRoll';
 import Mixer from './components/Mixer';
-import BasicSynthComponent from './synth/basic/Component';
-import BasicSynth from './synth/basic/synth';
 import * as Instruments from './instruments';
 
 import {
